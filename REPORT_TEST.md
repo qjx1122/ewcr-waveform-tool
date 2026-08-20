@@ -57,3 +57,28 @@
   - 例：`wave1_UA_MMC_compressed.ewcr` 约 4.5 KiB，对应 2000 点电压窗
 - 是否进入 REPORT.md（稳定结论）：否
 - 遗留问题：无独立 `ewcr_decode` 命令行
+
+## [2026-08-20] 专题：data/ 全通道重跑
+- 类型：验证专题
+- 目标与假设：wave1–4 的 UA/IA/UB/IB/UC/IC 全部进入五算法验证
+- 方法 / 数据 / 参数：10 周期 @ 10 kHz，跳过首周期
+- 结果 / 结论：120/120 PASS。电压通道相似度普遍 >99.9%；wave4 IB 偏置电流相似度可低至 ~63%（CS-OMP）
+- 是否进入 REPORT.md（稳定结论）：否
+- 遗留问题：未覆盖整段长记录
+
+## [2026-08-20] 专题：对照 MATLAB 复查 C 功能
+- 类型：验证专题
+- 目标与假设：C 移植应在相同工作点上复现 MATLAB 五算法的压缩比与重构保真度，而不仅是 C 编码器/解码器自洽
+- 方法 / 数据 / 参数：
+  - 对照 `matlab/algorithms/{ASBC,DWT_Hybrid,CS_OMP,MMC,SVDCS}` 与 `c/src/*.c`
+  - 金标准：`matlab/results/exp1_fixed_scenarios.csv`（IEEE 1159，10 周期，fs=12800，`benchmark_config` 固定点）
+  - 入口：`c/src/verify_five_codecs.c` 的 MATLAB exp1 compare 段；内核单测含 naive DFT 与 MATLAB `interpft`
+- 结果 / 结论：
+  - **缺陷**：`ewcr_interpft` 用整数 `(n+1)/2` 代替 MATLAB `ceil((n+1)/2)`，偶数长度把 DC 当 Nyquist 对半切。ASBC 4 周期纯正弦 SNR 从 ~304 dB 掉到 ~102 dB。修复后 4 周期 SNR≈304 dB，10 周期 ASBC CR 与 MATLAB **精确一致**（pure 86.7797，sag 44.7162，harmonics 60.5917，complex 8.9276）
+  - **MMC**：四场景 CR/SNR 与 MATLAB 表一致（pure CR=29.2571 SNR=79.92 dB）
+  - **SVDCS**：四场景 CR/SNR 与 MATLAB 表一致（pure CR=3.1920 SNR=90.31 dB）
+  - **CS-OMP**：CR 四场景均为 4.9042（公式量）；SNR 接近但因 Φ 的 RNG 不同不完全相等
+  - **DWT-Hybrid**：周期延拓 db4 ≠ MATLAB `wavedec` 默认 `sym`，CR 不可比；C 闭环 SNR 约 39–45 dB，功能正常
+  - 现场 `data/` 120/120 仍 PASS
+- 是否进入 REPORT.md（稳定结论）：否
+- 遗留问题：纯正弦 ASBC 10 周期 SNR 266 vs 294 dB（均为数值无损，CR 已对齐）；DWT 若要对齐 MATLAB CR 需改延拓

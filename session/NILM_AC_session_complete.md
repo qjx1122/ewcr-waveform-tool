@@ -84,3 +84,20 @@
 - 关键决策：仍用 10 周期窗；wave4 IB 弱电流允许较低相似度
 - 未决问题：未跑整段 5–10 s
 - 相关文件/分支：`c/src/verify_field_data.c`、`c/results/verify_field_data.csv`
+
+## [2026-08-20] 会话纪要
+- 目标：对照 MATLAB 源码复查 C 五算法功能是否正常
+- 完成项：
+  - 逐算法对照 encode/decode、默认参数、bit accounting、IEEE 1159 与指标
+  - 修复 `ewcr_interpft` 偶数长度 Nyquist 索引（ASBC 基带插值）
+  - 新增 FFT vs naive DFT、MATLAB interpft 单测
+  - `make test` 增加 10 周期 vs `exp1_fixed_scenarios.csv`：ASBC/MMC/SVDCS CR 对齐，MMC/SVDCS SNR 对齐
+  - `make test-data` 120/120 仍 PASS
+- 关键决策：
+  - 以 MATLAB exp1 固定工作点（10 周期 @ 12.8 kHz）为功能金标准，而不是短窗 2 周期
+  - DWT 不改为 `sym` 延拓：C 闭环正确，CR 差异属已知延拓不同
+  - CS-OMP 只强制 CR 对齐（公式量），SNR 允许 RNG 差异
+- 未决问题：
+  - 纯正弦 ASBC 10 周期 SNR 266 vs MATLAB 294 dB（CR 已精确一致）
+  - 无独立 `.ewcr` 解码 CLI
+- 相关文件/分支：`c/src/ewcr_math.c`、`c/src/verify_five_codecs.c`、`c/README.md`、`arena/01a01e0b-ewcr-waveform-tool`

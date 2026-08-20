@@ -80,12 +80,11 @@ static void init_poly_width(void)
 
 static void cheby_basis(int N, int ord, double *B)
 {
-    /* B is N x (ord+1) row-major */
+    /* B is N x (ord+1) row-major. t = linspace(-1, 1-1/N, N) as in MATLAB. */
     int p = ord + 1;
     for (int i = 0; i < N; i++) {
-        double t = -1.0 + (1.0 - 1.0 / N + 1.0) * i / (N - 1 == 0 ? 1 : (N - 1));
-        /* linspace(-1, 1-1/N, N) */
-        t = -1.0 + ((1.0 - 1.0 / N) - (-1.0)) * i / (double)(N - 1);
+        double t = (N <= 1) ? -1.0
+                            : -1.0 + ((1.0 - 1.0 / (double)N) - (-1.0)) * i / (double)(N - 1);
         B[i * p + 0] = 1.0;
         if (ord >= 1) B[i * p + 1] = t;
         for (int k = 2; k <= ord; k++)

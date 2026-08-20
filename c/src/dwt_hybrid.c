@@ -250,7 +250,9 @@ int dwt_codec_run(const double *x, int n, const DwtOpts *opt, double *xhat, Ewcr
     ewcr_waverec_db4(Crec, book, L, xhat);
     double t2 = ewcr_now_s();
 
-    ewcr_unified_metrics(x, xhat, n, bits_total, 12800.0, 50.0, D.RQ, &out->metrics);
+    double fs = (D.fs > 0.0) ? D.fs : 12800.0;
+    double f0 = (D.f0 > 0.0) ? D.f0 : 50.0;
+    ewcr_unified_metrics(x, xhat, n, bits_total, fs, f0, D.RQ, &out->metrics);
     out->enc_s = t1 - t0;
     out->dec_s = t2 - t1;
     out->N = n;
@@ -260,7 +262,7 @@ int dwt_codec_run(const double *x, int n, const DwtOpts *opt, double *xhat, Ewcr
     {
         EwcrBuf b;
         ewcr_buf_init(&b);
-        ewcr_pack_header(&b, 2, n, 0.0, 50.0, bits_total);
+        ewcr_pack_header(&b, 2, n, fs, f0, bits_total);
         ewcr_buf_u32(&b, (uint32_t)L);
         ewcr_buf_u32(&b, (uint32_t)D.qbits);
         ewcr_buf_u32(&b, (uint32_t)D.delta);

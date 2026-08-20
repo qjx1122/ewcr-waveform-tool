@@ -23,9 +23,10 @@ make test-data     # field CSV in ../data: ./build/verify_field_data
 
 `make test` runs:
 
-1. Kernel unit tests (FFT, DCT, Haar, db4 PR, Huffman, least squares)
+1. Kernel unit tests (FFT vs naive DFT, MATLAB `interpft` even/odd, DCT, Haar, db4 PR, Huffman, least squares)
 2. Encode→decode for all **five algorithms** on IEEE 1159 `pure` / `sag` / `harmonics` / `complex` (2 cycles @ 12.8 kHz)
 3. A longer pure sinusoid (4 cycles) for all five codecs
+4. 10-cycle compare against `matlab/results/exp1_fixed_scenarios.csv` (same `benchmark_config` operating point)
 
 `make test-data` scans every `*.csv` in `data/` (currently wave1–4, 10 kHz three-phase), takes 10 cycles of **all six channels UA/IA/UB/IB/UC/IC** after skipping the first cycle, and runs the same five codecs (4 files × 6 channels × 5 algos = 120 cases). SVDCS `signal_scale` is set to the segment peak so 16-bit p.u. quantizers do not clip field voltages.
 
@@ -58,6 +59,17 @@ Primary columns (original `x` vs reconstructed `xhat`):
 
 ## MATLAB vs C
 
-- Reconstruction is **C encoder / C decoder** consistent, not bit-identical to MATLAB (different DWT extension, CS sensing matrix RNG).
-- MMC on a pure 50 Hz sinusoid matched the MATLAB reference CR `29.257` and SNR `79.92 dB` in the verification run.
-- DWT-Hybrid / SVDCS compression ratio on *very short* records is dominated by Huffman/MC+LZW headers and can drop below 1; longer records behave like the MATLAB tables.
+10-cycle IEEE 1159 @ 12.8 kHz (`N=2560`), C vs `matlab/results/exp1_fixed_scenarios.csv`:
+
+| signal | algo | CR C | CR MATLAB | SNR C | SNR MATLAB |
+| --- | --- | ---: | ---: | ---: | ---: |
+| pure | ASBC | 86.7797 | 86.7797 | 266.20 | 294.59 |
+| pure | MMC | 29.2571 | 29.2571 | 79.92 | 79.92 |
+| pure | SVDCS | 3.1920 | 3.1920 | 90.31 | 90.31 |
+| pure | CS-OMP | 4.9042 | 4.9042 | 94.98 | 94.65 |
+| sag / harmonics / complex | ASBC, MMC, SVDCS | match to printed digits | | match to printed digits | |
+
+- **ASBC / MMC / SVDCS** share the MATLAB architecture, bit accounting, and (for MMC/SVDCS) reconstruction SNR on these records.
+- **CS-OMP** CR is analytic in `(N, M/N, ybits)` and matches; Φ uses a local xorshift+Box-Muller, not MATLAB `rng(42)+randn`, so SNR is close but not identical.
+- **DWT-Hybrid** is C encoder/decoder consistent but **not** MATLAB-identical: periodized db4 vs MATLAB `wavedec` default `sym` extension. Short records can have CR `< 1` from Huffman headers.
+- `interpft` (ASBC baseband upsample) uses MATLAB `ceil((m+1)/2)` Nyquist splitting. An earlier C integer `(m+1)/2` split DC on even `m` and collapsed 4-cycle pure-ASBC SNR from ~300 dB to ~102 dB; that is fixed.

@@ -124,11 +124,13 @@ typedef struct {
     int qbits;
     int delta;
     int RQ;
+    double fs, f0;      /* metrics only; 0 => 12800 / 50 */
 } DwtOpts;
 
 typedef struct {
     double M_ratio, tol;
     int K0, seed, ybits, RQ;
+    double fs, f0;      /* metrics only; 0 => 12800 / 50 */
 } CsOpts;
 
 typedef struct {

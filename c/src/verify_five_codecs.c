@@ -1,5 +1,6 @@
 #include "ewcr.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,8 +29,10 @@ int main(int argc, char **argv)
     int verbose_unit = 1;
     int cycles_short = 2;
     int cycles_long = 4;
+    int do_matlab = 1;
     if (argc > 1 && strcmp(argv[1], "--quick") == 0) {
         cycles_long = 2;
+        do_matlab = 0;
     }
 
     printf("EWCR five-codec C port verification\n");
@@ -49,7 +52,8 @@ int main(int argc, char **argv)
     const char *algos[5] = {"ASBC", "DWT-Hybrid", "CS-OMP", "MMC", "SVDCS"};
     const char *signals_short[4] = {"pure", "sag", "harmonics", "complex"};
 
-    int nmax = (int)round(cfg.fs * cycles_long / cfg.f0) + 16;
+    const int cycles_matlab = 10; /* matlab/experiments/exp1_fixed_scenarios.m */
+    int nmax = (int)round(cfg.fs * cycles_matlab / cfg.f0) + 16;
     double *x = (double *)ewcr_xmalloc((size_t)nmax * sizeof(double));
     double *xhat = (double *)ewcr_xmalloc((size_t)nmax * sizeof(double));
 
@@ -141,6 +145,130 @@ int main(int argc, char **argv)
                         r.metrics.PSNR_dB, r.enc_s, r.dec_s, r.note);
             }
             fflush(stdout);
+        }
+    }
+
+    /* --- 10-cycle IEEE 1159 vs MATLAB exp1_fixed_scenarios.csv --- */
+    if (do_matlab) {
+        typedef struct {
+            const char *signal;
+            const char *algo;
+            double CR;
+            double SNR_dB;
+        } MatlabRef;
+        static const MatlabRef refs[] = {
+            {"pure", "ASBC", 86.7796610169491, 294.594527938571},
+            {"pure", "DWT-Hybrid", 5.40226853073068, 35.5233084004896},
+            {"pure", "CS-OMP", 4.90421455938697, 94.6518489994766},
+            {"pure", "MMC", 29.2571428571429, 79.9210537311647},
+            {"pure", "SVDCS", 3.19201995012469, 90.3087336228232},
+            {"sag", "ASBC", 44.7161572052402, 33.9734530777162},
+            {"sag", "DWT-Hybrid", 4.0, 34.6729029763487},
+            {"sag", "CS-OMP", 4.90421455938697, 43.2314356453789},
+            {"sag", "MMC", 20.3073872087258, 76.5696998844263},
+            {"sag", "SVDCS", 3.12004875076173, 72.9193581731085},
+            {"harmonics", "ASBC", 60.5917159763314, 33.6968671628163},
+            {"harmonics", "DWT-Hybrid", 2.81821934773634, 37.5724165203979},
+            {"harmonics", "CS-OMP", 4.90421455938697, 95.2428189778234},
+            {"harmonics", "MMC", 16.4234161988773, 52.9568680966022},
+            {"harmonics", "SVDCS", 3.02779420461266, 79.3615271150213},
+            {"complex", "ASBC", 8.92763731473409, 28.4978610851198},
+            {"complex", "DWT-Hybrid", 3.33251972988365, 35.8367707115774},
+            {"complex", "CS-OMP", 4.90421455938697, 26.8175234964565},
+            {"complex", "MMC", 16.3122262046993, 34.9052431400195},
+            {"complex", "SVDCS", 1.82726623840114, 29.0012529042353},
+        };
+        const char *kinds[4] = {"pure", "sag", "harmonics", "complex"};
+        printf("\nMATLAB exp1 compare (10 cycles, N=2560, fs=12800):\n");
+        printf("%-12s %-14s %10s %10s %10s %10s %10s %8s\n", "signal", "algo", "CR_C",
+               "CR_ML", "SNR_C", "SNR_ML", "sim%", "align");
+        printf("--------------------------------------------------------------------------------"
+               "----------------\n");
+        for (int s = 0; s < 4; s++) {
+            int n = 0;
+            if (ewcr_gen_ieee1159(kinds[s], cfg.fs, cycles_matlab, x, &n) != 0) {
+                fprintf(stderr, "signal gen failed: %s\n", kinds[s]);
+                nfail++;
+                continue;
+            }
+            for (int a = 0; a < 5; a++) {
+                memset(xhat, 0, (size_t)n * sizeof(double));
+                EwcrRunResult r;
+                int rc = ewcr_run_codec(algos[a], x, n, &cfg, xhat, &r);
+                nrun++;
+                const MatlabRef *ref = NULL;
+                for (size_t k = 0; k < sizeof(refs) / sizeof(refs[0]); k++) {
+                    if (strcmp(refs[k].signal, kinds[s]) == 0 &&
+                        strcmp(refs[k].algo, algos[a]) == 0) {
+                        ref = &refs[k];
+                        break;
+                    }
+                }
+                int ok = (rc == 0 && r.ok && finite_vec(xhat, r.N > 0 ? r.N : n) &&
+                          isfinite(r.metrics.CR) && r.metrics.CR > 0 && isfinite(r.metrics.SNR_dB));
+                if (strcmp(kinds[s], "pure") == 0 && r.metrics.SNR_dB < 12.0) ok = 0;
+                int align = 1;
+                const char *why = "ok";
+                if (!ref) {
+                    align = 0;
+                    why = "no-ref";
+                } else if (strcmp(algos[a], "CS-OMP") == 0) {
+                    /* CR is analytic in (N, M_ratio, ybits); Phi RNG does not affect CR. */
+                    if (fabs(r.metrics.CR - ref->CR) / ref->CR > 1e-9) {
+                        align = 0;
+                        why = "CR";
+                    }
+                } else if (strcmp(algos[a], "MMC") == 0) {
+                    if (fabs(r.metrics.CR - ref->CR) / ref->CR > 1e-6) {
+                        align = 0;
+                        why = "CR";
+                    }
+                    if (strcmp(kinds[s], "pure") == 0 &&
+                        fabs(r.metrics.SNR_dB - ref->SNR_dB) > 0.05) {
+                        align = 0;
+                        why = "SNR";
+                    }
+                } else if (strcmp(algos[a], "ASBC") == 0 && strcmp(kinds[s], "pure") == 0) {
+                    if (r.metrics.SNR_dB < 200.0) {
+                        align = 0;
+                        why = "SNR";
+                    }
+                } else if (strcmp(algos[a], "SVDCS") == 0 && strcmp(kinds[s], "pure") == 0) {
+                    if (fabs(r.metrics.SNR_dB - ref->SNR_dB) > 1.0) {
+                        align = 0;
+                        why = "SNR";
+                    }
+                    if (fabs(r.metrics.CR - ref->CR) / ref->CR > 0.05) {
+                        align = 0;
+                        why = "CR";
+                    }
+                } else if (strcmp(algos[a], "DWT-Hybrid") == 0) {
+                    why = "ext";
+                    if (strcmp(kinds[s], "pure") == 0 && r.metrics.SNR_dB < 20.0) {
+                        align = 0;
+                        why = "SNR";
+                    }
+                }
+                if (!ok || !align) {
+                    nfail++;
+                    r.ok = 0;
+                }
+                printf("%-12s %-14s %10.4f %10.4f %10.2f %10.2f %10.4f %8s\n", kinds[s], algos[a],
+                       r.metrics.CR, ref ? ref->CR : NAN, r.metrics.SNR_dB,
+                       ref ? ref->SNR_dB : NAN, r.metrics.similarity_pct,
+                       (!ok || !align) ? "FAIL" : why);
+                if (csv) {
+                    fprintf(csv,
+                            "%s,%s,%d,%d,%d,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,"
+                            "\"matlab-exp1 %s\"\n",
+                            kinds[s], algos[a], cycles_matlab, r.N, ok && align, r.metrics.CR,
+                            r.metrics.similarity_pct, r.metrics.corr, r.metrics.SNR_dB,
+                            r.metrics.NMSE_dB, r.metrics.RMSE, r.metrics.PRD, r.metrics.MAXE,
+                            r.metrics.PSNR_dB, r.enc_s, r.dec_s, why);
+                }
+                ewcr_result_release(&r);
+                fflush(stdout);
+            }
         }
     }
 

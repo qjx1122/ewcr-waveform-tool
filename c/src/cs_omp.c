@@ -112,7 +112,14 @@ int cs_omp_codec_run(const double *x, int n, const CsOpts *opt, double *xhat, Ew
 {
     memset(out, 0, sizeof(*out));
     strcpy(out->algo, "CS-OMP");
-    CsOpts D = {0.20, 1e-6, 48, 42, 16, 16};
+    CsOpts D;
+    memset(&D, 0, sizeof(D));
+    D.M_ratio = 0.20;
+    D.tol = 1e-6;
+    D.K0 = 48;
+    D.seed = 42;
+    D.ybits = 16;
+    D.RQ = 16;
     if (opt) D = *opt;
     double t0 = ewcr_now_s();
 
@@ -164,7 +171,9 @@ int cs_omp_codec_run(const double *x, int n, const CsOpts *opt, double *xhat, Ew
     psi_times_s(s_hat, N, xhat);
     double t2 = ewcr_now_s();
 
-    ewcr_unified_metrics(x, xhat, n, bits_total, 12800.0, 50.0, D.RQ, &out->metrics);
+    double fs = (D.fs > 0.0) ? D.fs : 12800.0;
+    double f0 = (D.f0 > 0.0) ? D.f0 : 50.0;
+    ewcr_unified_metrics(x, xhat, n, bits_total, fs, f0, D.RQ, &out->metrics);
     out->enc_s = t1 - t0;
     out->dec_s = t2 - t1;
     out->N = n;
@@ -174,7 +183,7 @@ int cs_omp_codec_run(const double *x, int n, const CsOpts *opt, double *xhat, Ew
     {
         EwcrBuf b;
         ewcr_buf_init(&b);
-        ewcr_pack_header(&b, 3, N, 0.0, 50.0, bits_total);
+        ewcr_pack_header(&b, 3, N, fs, f0, bits_total);
         ewcr_buf_u32(&b, (uint32_t)M);
         ewcr_buf_u32(&b, (uint32_t)D.K0);
         ewcr_buf_i32(&b, D.seed);

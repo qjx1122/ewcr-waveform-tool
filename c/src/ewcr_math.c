@@ -198,13 +198,14 @@ void ewcr_interpft(const cpx *x, int n, cpx *y, int ny)
     memcpy(X, x, (size_t)n * sizeof(cpx));
     ewcr_fft(X, n, 0);
     cpx *Y = (cpx *)ewcr_xcalloc((size_t)ny, sizeof(cpx));
-    int nyqst = (n + 1) / 2; /* ceil((n+1)/2) with 0-based copy count = nyqst */
-    /* MATLAB: nyqst = ceil((m+1)/2) is 1-based length of positive incl DC */
+    /* MATLAB interpft: nyqst = ceil((m+1)/2). Integer ceil((n+1)/2) = (n+2)/2.
+       The old (n+1)/2 is floor((n+1)/2) and splits DC instead of Nyquist when n is even. */
+    int nyqst = (n + 2) / 2;
     for (int i = 0; i < nyqst; i++) Y[i] = X[i];
     int tail = n - nyqst;
     for (int i = 0; i < tail; i++) Y[ny - tail + i] = X[nyqst + i];
     if ((n % 2) == 0) {
-        /* split Nyquist bin */
+        /* split Nyquist bin (MATLAB Y(nyqst) and Y(nyqst+ny-m)) */
         cpx half = cpx_scale(Y[nyqst - 1], 0.5);
         Y[nyqst - 1] = half;
         Y[ny - n + nyqst - 1] = half;
@@ -1001,10 +1002,18 @@ int ewcr_run_codec(const char *algo, const double *x, int n, const EwcrBenchCfg 
     strncpy(out->algo, algo, sizeof(out->algo) - 1);
     if (strcmp(algo, "ASBC") == 0)
         return asbc_codec_run(x, n, cfg->fs, &cfg->asbc, xhat, out);
-    if (strcmp(algo, "DWT-Hybrid") == 0 || strcmp(algo, "DWT") == 0)
-        return dwt_codec_run(x, n, &cfg->dwt, xhat, out);
-    if (strcmp(algo, "CS-OMP") == 0 || strcmp(algo, "CS") == 0)
-        return cs_omp_codec_run(x, n, &cfg->cs, xhat, out);
+    if (strcmp(algo, "DWT-Hybrid") == 0 || strcmp(algo, "DWT") == 0) {
+        DwtOpts o = cfg->dwt;
+        o.fs = cfg->fs;
+        o.f0 = cfg->f0;
+        return dwt_codec_run(x, n, &o, xhat, out);
+    }
+    if (strcmp(algo, "CS-OMP") == 0 || strcmp(algo, "CS") == 0) {
+        CsOpts o = cfg->cs;
+        o.fs = cfg->fs;
+        o.f0 = cfg->f0;
+        return cs_omp_codec_run(x, n, &o, xhat, out);
+    }
     if (strcmp(algo, "MMC") == 0)
         return mmc_codec_run(x, n, &cfg->mmc, xhat, out);
     if (strcmp(algo, "SVDCS") == 0)
@@ -1040,6 +1049,67 @@ int ewcr_unit_tests(int verbose)
         CHECK(sqrt(e / n) < 1e-12, "fft pow2 roundtrip");
         free(x);
         free(y);
+    }
+    /* FFT vs naive DFT (MATLAB fft convention, unnormalized) */
+    {
+        int n = 20;
+        cpx *x = (cpx *)ewcr_xmalloc((size_t)n * sizeof(cpx));
+        cpx *X = (cpx *)ewcr_xmalloc((size_t)n * sizeof(cpx));
+        for (int i = 0; i < n; i++) x[i] = cpx_make(cos(0.7 * i), 0.2 * sin(1.3 * i));
+        memcpy(X, x, (size_t)n * sizeof(cpx));
+        ewcr_fft(X, n, 0);
+        double e = 0;
+        for (int k = 0; k < n; k++) {
+            cpx acc = cpx_make(0, 0);
+            for (int t = 0; t < n; t++) {
+                double ang = -2.0 * M_PI * (double)k * (double)t / (double)n;
+                acc = cpx_add(acc, cpx_mul(x[t], cpx_make(cos(ang), sin(ang))));
+            }
+            e += cpx_abs2(cpx_sub(X[k], acc));
+        }
+        CHECK(sqrt(e / n) < 1e-9, "fft bluestein vs naive dft n=20");
+        free(x);
+        free(X);
+    }
+    /* MATLAB interpft: even and odd source lengths (ASBC baseband upsample) */
+    {
+        int ns[3] = {2, 4, 5};
+        int ny = 32;
+        int ok_all = 1;
+        for (int ti = 0; ti < 3; ti++) {
+            int n = ns[ti];
+            cpx *x = (cpx *)ewcr_xmalloc((size_t)n * sizeof(cpx));
+            cpx *y = (cpx *)ewcr_xmalloc((size_t)ny * sizeof(cpx));
+            cpx *X = (cpx *)ewcr_xmalloc((size_t)n * sizeof(cpx));
+            cpx *Y = (cpx *)ewcr_xcalloc((size_t)ny, sizeof(cpx));
+            for (int i = 0; i < n; i++)
+                x[i] = cpx_make(cos(2 * M_PI * i / (double)n), sin(2 * M_PI * i / (double)n));
+            ewcr_interpft(x, n, y, ny);
+            /* reference: MATLAB interpft spectrum zero-pad */
+            memcpy(X, x, (size_t)n * sizeof(cpx));
+            ewcr_fft(X, n, 0);
+            int nyqst = (int)ceil((n + 1) / 2.0);
+            for (int i = 0; i < nyqst; i++) Y[i] = X[i];
+            int tail = n - nyqst;
+            for (int i = 0; i < tail; i++) Y[ny - tail + i] = X[nyqst + i];
+            if ((n % 2) == 0) {
+                cpx half = cpx_scale(Y[nyqst - 1], 0.5);
+                Y[nyqst - 1] = half;
+                Y[ny - n + nyqst - 1] = half;
+            }
+            ewcr_fft(Y, ny, 1);
+            double e = 0;
+            for (int i = 0; i < ny; i++) {
+                cpx ref = cpx_scale(Y[i], (double)ny / (double)n);
+                e += cpx_abs2(cpx_sub(y[i], ref));
+            }
+            if (sqrt(e / ny) >= 1e-10) ok_all = 0;
+            free(x);
+            free(y);
+            free(X);
+            free(Y);
+        }
+        CHECK(ok_all, "interpft matches MATLAB even/odd n");
     }
     {
         int n = 100;
