@@ -1,26 +1,23 @@
 # STATUS.md
 ## 当前目标
-- 输出压缩文件与复原波形文件（已完成）
+- 对 `data/` 全部波形（4 文件 × 6 通道）重跑五算法验证（已完成）
 
 ## 已完成
-- [x] 五算法打包 `.ewcr` 压缩码流
-- [x] 写出 `*_original.csv` / `*_reconstructed.csv` / `*_compare.csv`
-- [x] 现场验证 `results/out/manifest.csv` 索引
-- [x] 合成 25/25、现场 40/40 仍全部 PASS
+- [x] `verify_field_data` 扫描目录全部 CSV，通道 UA/IA/UB/IB/UC/IC
+- [x] 120/120 用例 PASS；结果 `c/results/verify_field_data.csv` 与 `c/results/out/`
 
 ## 进行中
 - 无
 
 ## 下一步（TODO）
-1. 如需：从 `.ewcr` 独立解码的命令行工具
-2. 如需：全通道 / 更长现场片段
+1. 如需：整段长记录（>10 周期）
+2. 如需：独立 `.ewcr` 解码 CLI
 
 ## 决策记录 / 踩坑
-- 压缩文件为自定义小端容器，魔数 `EWCR`；CSV 为可读波形
-- `results/out/` 下大批 CSV/bin 不进 Git（gitignore），只提交 README 与 manifest
-- 验证仍在内存编解码；落盘是额外产物，不改变算法
+- wave4 IB 峰值仅 0.4 A、近似直流偏置，ASBC 估 F0=53.7 Hz，部分算法相似度降到 ~64–80%，仍判 PASS（有限重构 + CR>0）
+- 每通道仍取跳过 1 周期后的 10 周期，避免 CS-OMP/MMC 吃整段 5–10 s
 
 ## 关键文件路径
-- `c/results/out/` — 压缩与复原文件
-- `c/src/ewcr_io.c` — 读写
+- `data/wave{1,2,3,4}.csv`
+- `c/results/verify_field_data.csv`
 - `c/results/out/manifest.csv`

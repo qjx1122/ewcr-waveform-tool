@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 static int file_exists(const char *p)
 {
@@ -70,10 +71,51 @@ int main(int argc, char **argv)
     printf("EWCR field-data five-codec verification\n");
     printf("data dir: %s\n", datadir);
     printf("segment: %d cycles @ estimated fs (skip 1 cycle)\n", cycles);
+    printf("channels: UA IA UB IB UC IC  (all waveform columns)\n");
     printf("压缩比 CR = (N*16 bit)/bits_compressed;  相似度%% = 100*Pearson(original, reconstructed)\n\n");
 
-    const char *files[] = {"wave1.csv", "wave2.csv", "wave3.csv", "wave4.csv"};
-    const char *chans[] = {"UA", "IA"};
+    char files[32][64];
+    int nfiles = 0;
+    {
+        DIR *dp = opendir(datadir);
+        if (!dp) {
+            fprintf(stderr, "Cannot open data dir %s\n", datadir);
+            return 2;
+        }
+        struct dirent *de;
+        while ((de = readdir(dp)) != NULL) {
+            const char *nm = de->d_name;
+            size_t L = strlen(nm);
+            if (L > 4 && strcmp(nm + L - 4, ".csv") == 0) {
+                if (nfiles < 32) {
+                    snprintf(files[nfiles], sizeof(files[0]), "%s", nm);
+                    nfiles++;
+                }
+            }
+        }
+        closedir(dp);
+        /* sort names */
+        for (int i = 0; i < nfiles; i++) {
+            for (int j = i + 1; j < nfiles; j++) {
+                if (strcmp(files[j], files[i]) < 0) {
+                    char tmp[64];
+                    snprintf(tmp, sizeof(tmp), "%s", files[i]);
+                    snprintf(files[i], sizeof(files[0]), "%s", files[j]);
+                    snprintf(files[j], sizeof(files[0]), "%s", tmp);
+                }
+            }
+        }
+    }
+    if (nfiles < 1) {
+        fprintf(stderr, "No CSV files in %s\n", datadir);
+        return 2;
+    }
+    printf("CSV files (%d):", nfiles);
+    for (int i = 0; i < nfiles; i++) printf(" %s", files[i]);
+    printf("\n\n");
+
+    const char *chans[] = {"UA", "IA", "UB", "IB", "UC", "IC"};
+    const int nch = 6;
     const char *algos[] = {"ASBC", "DWT-Hybrid", "CS-OMP", "MMC", "SVDCS"};
 
     mkdir("results", 0755);
@@ -92,7 +134,7 @@ int main(int argc, char **argv)
     printf("----------------------------------------------------------------------------------------------------\n");
 
     int nrun = 0, nfail = 0;
-    for (int fi = 0; fi < 4; fi++) {
+    for (int fi = 0; fi < nfiles; fi++) {
         char path[768];
         snprintf(path, sizeof(path), "%s/%s", datadir, files[fi]);
         EwcrWaveCsv w;
@@ -101,8 +143,10 @@ int main(int argc, char **argv)
             nfail++;
             continue;
         }
-        printf("# %s  n=%d  fs=%.2f Hz  dur=%.3f s  UA_peak=%.2f  IA_peak=%.3f\n", files[fi], w.n,
-               w.fs, w.n / w.fs, peak_abs(w.UA, w.n), peak_abs(w.IA, w.n));
+        printf("# %s  n=%d  fs=%.2f Hz  dur=%.3f s\n", files[fi], w.n, w.fs, w.n / w.fs);
+        printf("    peaks  UA=%.2f IA=%.3f UB=%.2f IB=%.3f UC=%.2f IC=%.3f\n",
+               peak_abs(w.UA, w.n), peak_abs(w.IA, w.n), peak_abs(w.UB, w.n),
+               peak_abs(w.IB, w.n), peak_abs(w.UC, w.n), peak_abs(w.IC, w.n));
 
         double f0 = 50.0;
         int spc = (int)round(w.fs / f0);
@@ -122,8 +166,9 @@ int main(int argc, char **argv)
         }
 
         double *xhat = (double *)ewcr_xmalloc((size_t)nseg * sizeof(double));
-        for (int ci = 0; ci < 2; ci++) {
+        for (int ci = 0; ci < nch; ci++) {
             const double *full = ewcr_wave_channel(&w, chans[ci]);
+            if (!full) continue;
             const double *x = full + skip;
             double peak = peak_abs(x, nseg);
             EwcrBenchCfg cfg;

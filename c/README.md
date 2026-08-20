@@ -27,7 +27,7 @@ make test-data     # field CSV in ../data: ./build/verify_field_data
 2. Encode→decode for all **five algorithms** on IEEE 1159 `pure` / `sag` / `harmonics` / `complex` (2 cycles @ 12.8 kHz)
 3. A longer pure sinusoid (4 cycles) for all five codecs
 
-`make test-data` loads `data/wave1.csv` … `wave4.csv` (10 kHz, three-phase UA/IA/UB/IB/UC/IC), takes 10 cycles of **UA** and **IA** after skipping the first cycle, and runs the same five codecs. SVDCS `signal_scale` is set to the segment peak so 16-bit p.u. quantizers do not clip field voltages.
+`make test-data` scans every `*.csv` in `data/` (currently wave1–4, 10 kHz three-phase), takes 10 cycles of **all six channels UA/IA/UB/IB/UC/IC** after skipping the first cycle, and runs the same five codecs (4 files × 6 channels × 5 algos = 120 cases). SVDCS `signal_scale` is set to the segment peak so 16-bit p.u. quantizers do not clip field voltages.
 
 CSV: `c/results/verify_five_codecs.csv`, `c/results/verify_field_data.csv`
 

@@ -74,3 +74,13 @@
   - 大批波形 CSV 不提交 Git，只提交 README + manifest
 - 未决问题：尚未提供从 `.ewcr` 单独解码的 CLI
 - 相关文件/分支：`c/src/ewcr_io.c`、`c/results/out/`
+
+## [2026-08-20] 会话纪要
+- 目标：重新运行 data 目录下全部波形验证
+- 完成项：
+  - 扫描 `data/*.csv`，六通道 UA/IA/UB/IB/UC/IC
+  - 120/120 PASS（4 文件 × 6 通道 × 5 算法）
+  - 刷新 `verify_field_data.csv`、`manifest.csv` 与 `results/out/` 产物
+- 关键决策：仍用 10 周期窗；wave4 IB 弱电流允许较低相似度
+- 未决问题：未跑整段 5–10 s
+- 相关文件/分支：`c/src/verify_field_data.c`、`c/results/verify_field_data.csv`
