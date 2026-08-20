@@ -69,7 +69,8 @@ int main(int argc, char **argv)
     }
     printf("EWCR field-data five-codec verification\n");
     printf("data dir: %s\n", datadir);
-    printf("segment: %d cycles @ estimated fs (skip 1 cycle)\n\n", cycles);
+    printf("segment: %d cycles @ estimated fs (skip 1 cycle)\n", cycles);
+    printf("压缩比 CR = (N*16 bit)/bits_compressed;  相似度%% = 100*Pearson(original, reconstructed)\n\n");
 
     const char *files[] = {"wave1.csv", "wave2.csv", "wave3.csv", "wave4.csv"};
     const char *chans[] = {"UA", "IA"};
@@ -79,12 +80,12 @@ int main(int argc, char **argv)
     FILE *csv = fopen("results/verify_field_data.csv", "w");
     if (!csv) csv = fopen("c/results/verify_field_data.csv", "w");
     if (csv)
-        fprintf(csv, "file,channel,algo,fs,N,ok,CR,SNR_dB,NMSE_dB,RMSE,PRD,MAXE,PSNR_dB,"
-                     "enc_s,dec_s,note\n");
+        fprintf(csv, "file,channel,algo,fs,N,ok,compress_ratio,similarity_pct,corr,SNR_dB,"
+                     "NMSE_dB,RMSE,PRD,MAXE,PSNR_dB,enc_s,dec_s,note\n");
 
-    printf("%-10s %-4s %-12s %7s %6s %8s %9s %8s %8s  %s\n", "file", "ch", "algo", "fs", "N", "CR",
-           "SNR_dB", "enc_ms", "dec_ms", "status");
-    printf("-------------------------------------------------------------------------------------------\n");
+    printf("%-10s %-4s %-12s %7s %6s %10s %10s %9s %8s %8s  %s\n", "file", "ch", "algo", "fs", "N",
+           "CR", "sim%", "SNR_dB", "enc_ms", "dec_ms", "status");
+    printf("----------------------------------------------------------------------------------------------------\n");
 
     int nrun = 0, nfail = 0;
     for (int fi = 0; fi < 4; fi++) {
@@ -140,15 +141,18 @@ int main(int argc, char **argv)
                 r.ok = ok;
                 nrun++;
                 if (!ok) nfail++;
-                printf("%-10s %-4s %-12s %7.0f %6d %8.3f %9.2f %8.1f %8.1f  %s (%s)\n", files[fi],
-                       chans[ci], algos[a], w.fs, r.N, r.metrics.CR, r.metrics.SNR_dB,
-                       1000.0 * r.enc_s, 1000.0 * r.dec_s, ok ? "PASS" : "FAIL", r.note);
+                printf("%-10s %-4s %-12s %7.0f %6d %10.3f %10.4f %9.2f %8.1f %8.1f  %s (%s)\n",
+                       files[fi], chans[ci], algos[a], w.fs, r.N, r.metrics.CR,
+                       r.metrics.similarity_pct, r.metrics.SNR_dB, 1000.0 * r.enc_s,
+                       1000.0 * r.dec_s, ok ? "PASS" : "FAIL", r.note);
                 fflush(stdout);
                 if (csv)
-                    fprintf(csv, "%s,%s,%s,%.8g,%d,%d,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,\"%s\"\n",
+                    fprintf(csv,
+                            "%s,%s,%s,%.8g,%d,%d,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,\"%s\"\n",
                             files[fi], chans[ci], algos[a], w.fs, r.N, ok, r.metrics.CR,
-                            r.metrics.SNR_dB, r.metrics.NMSE_dB, r.metrics.RMSE, r.metrics.PRD,
-                            r.metrics.MAXE, r.metrics.PSNR_dB, r.enc_s, r.dec_s, r.note);
+                            r.metrics.similarity_pct, r.metrics.corr, r.metrics.SNR_dB,
+                            r.metrics.NMSE_dB, r.metrics.RMSE, r.metrics.PRD, r.metrics.MAXE,
+                            r.metrics.PSNR_dB, r.enc_s, r.dec_s, r.note);
             }
         }
         free(xhat);

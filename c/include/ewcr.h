@@ -74,11 +74,13 @@ typedef struct {
     int N;
     double bits_original;
     double bits_compressed;
-    double CR;
+    double CR;                 /* 波形压缩比: (N*raw_bits) / bits_compressed */
     double rate_bps;
+    double corr;               /* Pearson r(x, xhat), 波形相似度 [-1,1] */
+    double similarity_pct;     /* 100*corr, 波形相似度百分数 */
     double NMSE_lin;
     double NMSE_dB;
-    double SNR_dB;
+    double SNR_dB;             /* 10 log10(||x||^2 / ||x-xhat||^2), 能量保真度 */
     double RMSE;
     double PRD;
     double MAXE;

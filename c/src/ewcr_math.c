@@ -857,6 +857,30 @@ void ewcr_unified_metrics(const double *x, const double *xhat, int n,
     m->PRD = 100.0 * sqrt(Ee / fmax(Es, 1e-30));
     m->PSNR_dB = 20.0 * log10(fmax(peak, 1e-30) / fmax(m->RMSE, 1e-30));
 
+    /* Pearson r(x, xhat): waveform similarity vs reconstruction. */
+    {
+        double mx = 0.0, mh = 0.0;
+        for (int i = 0; i < n; i++) {
+            mx += x[i];
+            mh += xhat[i];
+        }
+        mx /= fmax((double)n, 1.0);
+        mh /= fmax((double)n, 1.0);
+        double num = 0.0, vx = 0.0, vh = 0.0;
+        for (int i = 0; i < n; i++) {
+            double dx = x[i] - mx;
+            double dh = xhat[i] - mh;
+            num += dx * dh;
+            vx += dx * dx;
+            vh += dh * dh;
+        }
+        double den = sqrt(vx * vh);
+        m->corr = (den > 1e-30) ? (num / den) : 0.0;
+        if (m->corr > 1.0) m->corr = 1.0;
+        if (m->corr < -1.0) m->corr = -1.0;
+        m->similarity_pct = 100.0 * m->corr;
+    }
+
     if (fs <= 0 || f0 <= 0) return;
     double *A = (double *)ewcr_xmalloc((size_t)n * 2 * sizeof(double));
     double *co = (double *)ewcr_xmalloc(2 * sizeof(double));
@@ -1094,6 +1118,19 @@ int ewcr_unit_tests(int verbose)
         double x[2];
         ewcr_ls_solve(A, 3, 2, b, x);
         CHECK(fabs(x[0] - 1) < 1e-9 && fabs(x[1] - 2) < 1e-9, "ls 2-col");
+    }
+    /* Pearson identity / scaled copy */
+    {
+        double x[8], y[8];
+        for (int i = 0; i < 8; i++) {
+            x[i] = (double)i;
+            y[i] = 2.0 * x[i] + 3.0;
+        }
+        EwcrMetrics m;
+        ewcr_unified_metrics(x, x, 8, 8, 0, 0, 16, &m);
+        CHECK(fabs(m.corr - 1.0) < 1e-12 && fabs(m.similarity_pct - 100.0) < 1e-9, "corr identity");
+        ewcr_unified_metrics(x, y, 8, 8, 0, 0, 16, &m);
+        CHECK(fabs(m.corr - 1.0) < 1e-12, "corr affine");
     }
 #undef CHECK
     return fails;

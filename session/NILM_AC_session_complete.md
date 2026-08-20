@@ -49,3 +49,15 @@
   - 未跑 UB/IB/UC/IC 与整段长记录
   - ASBC 现场 F0 估计受 FFT 栅格影响（48.83 Hz vs 50 Hz）
 - 相关文件/分支：`data/`、`c/src/verify_field_data.c`、`c/results/verify_field_data.csv`、`arena/01a01e0b-ewcr-waveform-tool`
+
+## [2026-08-20] 会话纪要
+- 目标：增加输出波形压缩比与波形相似度（原始波形 vs 复原波形）
+- 完成项：
+  - `ewcr_unified_metrics` 计算 Pearson `corr`、`similarity_pct`
+  - 合成/现场验证终端与 CSV 增加 `compress_ratio`、`similarity_pct`、`corr`
+  - 单测 corr identity/affine；`make test` 与 `make test-data` 全过
+- 关键决策：
+  - 压缩比 = CR（16 bit 计账）；相似度 = Pearson，不用 SNR 冒充相似度
+  - SNR_dB 仍输出，作为能量保真度
+- 未决问题：未落盘逐点 original/reconstructed 波形 CSV
+- 相关文件/分支：`c/include/ewcr.h`、`c/src/ewcr_math.c`、`c/src/verify_*.c`、`c/results/*.csv`

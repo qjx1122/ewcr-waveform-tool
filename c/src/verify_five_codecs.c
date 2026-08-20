@@ -16,7 +16,7 @@ static int finite_vec(const double *x, int n)
 static void print_header(void)
 {
     printf("\n%-12s %-14s %6s %10s %10s %10s %10s %10s  %s\n",
-           "signal", "algo", "N", "CR", "SNR_dB", "PRD", "enc_ms", "dec_ms", "note");
+           "signal", "algo", "N", "压缩比CR", "相似度%", "SNR_dB", "enc_ms", "dec_ms", "note");
     printf("--------------------------------------------------------------------------------"
            "--------------------------------\n");
 }
@@ -34,6 +34,7 @@ int main(int argc, char **argv)
 
     printf("EWCR five-codec C port verification\n");
     printf("===================================\n");
+    printf("压缩比 CR = (N*16 bit)/bits_compressed;  相似度%% = 100*Pearson(x,xhat)\n");
     printf("Unit tests...\n");
     int uf = ewcr_unit_tests(verbose_unit);
     if (uf) {
@@ -59,8 +60,8 @@ int main(int argc, char **argv)
     if (!csv) csv = fopen("c/results/verify_five_codecs.csv", "w");
     if (!csv) csv = fopen("/tmp/verify_five_codecs.csv", "w");
     if (csv) {
-        fprintf(csv, "signal,algo,cycles,N,ok,CR,SNR_dB,NMSE_dB,RMSE,PRD,MAXE,PSNR_dB,"
-                     "enc_s,dec_s,note\n");
+        fprintf(csv, "signal,algo,cycles,N,ok,compress_ratio,similarity_pct,corr,SNR_dB,"
+                     "NMSE_dB,RMSE,PRD,MAXE,PSNR_dB,enc_s,dec_s,note\n");
     }
 
     int nfail = 0, nrun = 0;
@@ -87,14 +88,16 @@ int main(int argc, char **argv)
             if (strcmp(algos[a], "SVDCS") == 0 && strstr(r.note, "LZW roundtrip failed")) ok = 0;
             r.ok = ok;
             if (!ok) nfail++;
-            printf("%-12s %-14s %6d %10.3f %10.2f %10.4f %10.2f %10.2f  %s (%s)\n",
-                   signals_short[s], algos[a], r.N, r.metrics.CR, r.metrics.SNR_dB, r.metrics.PRD,
-                   1000.0 * r.enc_s, 1000.0 * r.dec_s, ok ? "PASS" : "FAIL", r.note);
+            printf("%-12s %-14s %6d %10.3f %10.4f %10.2f %10.2f %10.2f  %s (%s)\n",
+                   signals_short[s], algos[a], r.N, r.metrics.CR, r.metrics.similarity_pct,
+                   r.metrics.SNR_dB, 1000.0 * r.enc_s, 1000.0 * r.dec_s, ok ? "PASS" : "FAIL",
+                   r.note);
             if (csv) {
-                fprintf(csv, "%s,%s,%d,%d,%d,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,\"%s\"\n",
+                fprintf(csv, "%s,%s,%d,%d,%d,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,\"%s\"\n",
                         signals_short[s], algos[a], cycles_short, r.N, ok, r.metrics.CR,
-                        r.metrics.SNR_dB, r.metrics.NMSE_dB, r.metrics.RMSE, r.metrics.PRD,
-                        r.metrics.MAXE, r.metrics.PSNR_dB, r.enc_s, r.dec_s, r.note);
+                        r.metrics.similarity_pct, r.metrics.corr, r.metrics.SNR_dB,
+                        r.metrics.NMSE_dB, r.metrics.RMSE, r.metrics.PRD, r.metrics.MAXE,
+                        r.metrics.PSNR_dB, r.enc_s, r.dec_s, r.note);
             }
             fflush(stdout);
         }
@@ -115,12 +118,13 @@ int main(int argc, char **argv)
                       isfinite(r.metrics.SNR_dB) && r.metrics.SNR_dB >= 12.0 && r.metrics.CR > 0);
             r.ok = ok;
             if (!ok) nfail++;
-            printf("%-12s %-14s %6d %10.3f %10.2f %10.4f %10.2f %10.2f  %s (%s)\n", "pure*",
-                   algos[a], r.N, r.metrics.CR, r.metrics.SNR_dB, r.metrics.PRD, 1000.0 * r.enc_s,
-                   1000.0 * r.dec_s, ok ? "PASS" : "FAIL", r.note);
+            printf("%-12s %-14s %6d %10.3f %10.4f %10.2f %10.2f %10.2f  %s (%s)\n", "pure*",
+                   algos[a], r.N, r.metrics.CR, r.metrics.similarity_pct, r.metrics.SNR_dB,
+                   1000.0 * r.enc_s, 1000.0 * r.dec_s, ok ? "PASS" : "FAIL", r.note);
             if (csv) {
-                fprintf(csv, "%s,%s,%d,%d,%d,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,\"%s\"\n",
-                        "pure", algos[a], cycles_long, r.N, ok, r.metrics.CR, r.metrics.SNR_dB,
+                fprintf(csv, "%s,%s,%d,%d,%d,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,%.8g,\"%s\"\n",
+                        "pure", algos[a], cycles_long, r.N, ok, r.metrics.CR,
+                        r.metrics.similarity_pct, r.metrics.corr, r.metrics.SNR_dB,
                         r.metrics.NMSE_dB, r.metrics.RMSE, r.metrics.PRD, r.metrics.MAXE,
                         r.metrics.PSNR_dB, r.enc_s, r.dec_s, r.note);
             }

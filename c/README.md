@@ -33,6 +33,12 @@ CSV: `c/results/verify_five_codecs.csv`, `c/results/verify_field_data.csv`
 
 A case PASSes when reconstruction is finite, `CR > 0`, `SNR` is finite, and SNR on a pure sinusoid is at least 12 dB. SVDCS also checks the LZW payload round-trip.
 
+Primary columns (original `x` vs reconstructed `xhat`):
+
+- **压缩比 `compress_ratio` / `CR`** = `(N × 16 bit) / bits_compressed`
+- **波形相似度 `similarity_pct`** = `100 × PearsonCorr(x, xhat)`（%）；`corr` 为同一系数，范围 [-1, 1]
+- `SNR_dB` remains the energy-fidelity metric `10 log10(||x||² / ||x-xhat||²)`
+
 ## Defaults (aligned with `matlab/common/benchmark_config.m`)
 
 - `fs = 12800`, `f0 = 50`, 16-bit original PCM
