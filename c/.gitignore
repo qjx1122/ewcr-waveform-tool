@@ -1,1 +1,4 @@
 build/
+results/out/*
+!results/out/README.md
+!results/out/manifest.csv

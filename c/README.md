@@ -31,6 +31,14 @@ make test-data     # field CSV in ../data: ./build/verify_field_data
 
 CSV: `c/results/verify_five_codecs.csv`, `c/results/verify_field_data.csv`
 
+Per-case files (under `c/results/out/`):
+
+- `*_original.csv` — original waveform (`sample,time_s,value`)
+- `*_reconstructed.csv` — decoded waveform
+- `*_compare.csv` — original vs reconstructed vs error
+- `*_compressed.ewcr` — binary compressed bitstream (magic `EWCR`)
+- `manifest.csv` — index of field-data outputs
+
 A case PASSes when reconstruction is finite, `CR > 0`, `SNR` is finite, and SNR on a pure sinusoid is at least 12 dB. SVDCS also checks the LZW payload round-trip.
 
 Primary columns (original `x` vs reconstructed `xhat`):

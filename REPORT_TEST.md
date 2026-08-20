@@ -46,4 +46,14 @@
   - 现场 UA：压缩比 MMC≈16.6、CS-OMP=4.88、ASBC≈11–15；相似度均 >99.9%
   - Pearson 对工频波形极不敏感（小误差仍 ~100%），细部差异仍看 SNR_dB
 - 是否进入 REPORT.md（稳定结论）：否
-- 遗留问题：未输出逐点对比波形文件
+- 遗留问题：未输出逐点对比波形文件（已在后续专题解决）
+
+## [2026-08-20] 专题：压缩文件与复原文件落盘
+- 类型：用户专题
+- 目标与假设：每次编解码写出压缩码流和复原波形，便于离线查看
+- 方法 / 数据 / 参数：`ewcr_save_case_files`；现场 10 周期 UA/IA；合成 IEEE 1159
+- 结果 / 结论：
+  - `c/results/out/` 每例 4 个文件：original / reconstructed / compare CSV + compressed.ewcr
+  - 例：`wave1_UA_MMC_compressed.ewcr` 约 4.5 KiB，对应 2000 点电压窗
+- 是否进入 REPORT.md（稳定结论）：否
+- 遗留问题：无独立 `ewcr_decode` 命令行

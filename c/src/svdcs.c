@@ -552,6 +552,23 @@ int svdcs_codec_run(const double *x, int n, const SvdcsOpts *opt, double *xhat, 
         snprintf(out->note, sizeof(out->note), "nF=%d Nppc=%d payload=%d LZW=%d", nF, M, payload_n, nCodes);
     }
 
+    if (payload && payload_n > 0) {
+        EwcrBuf b;
+        ewcr_buf_init(&b);
+        ewcr_pack_header(&b, 5, nsync, D.fs, D.f0, bits_total);
+        ewcr_buf_u32(&b, (uint32_t)M);
+        ewcr_buf_u32(&b, (uint32_t)nF);
+        ewcr_buf_u32(&b, (uint32_t)nCodes);
+        ewcr_buf_u32(&b, (uint32_t)payload_n);
+        ewcr_buf_f64(&b, fftStep);
+        ewcr_buf_f64(&b, D.signal_scale);
+        ewcr_buf_f64(&b, D.G);
+        ewcr_buf_f64(&b, D.beta);
+        ewcr_buf_bytes(&b, payload, (size_t)payload_n);
+        out->compressed = b.d;
+        out->compressed_nbytes = (int)b.n;
+    }
+
     free(xpu);
     free(frames);
     free(Afloat);

@@ -61,3 +61,16 @@
   - SNR_dB 仍输出，作为能量保真度
 - 未决问题：未落盘逐点 original/reconstructed 波形 CSV
 - 相关文件/分支：`c/include/ewcr.h`、`c/src/ewcr_math.c`、`c/src/verify_*.c`、`c/results/*.csv`
+
+## [2026-08-20] 会话纪要
+- 目标：输出压缩后的文件及复原后的文件
+- 完成项：
+  - 新增 `ewcr_io.c`：CSV 波形 + `.ewcr` 二进制容器
+  - 五算法在 `*_codec_run` 末尾打包压缩载荷
+  - `make test` / `make test-data` 写入 `c/results/out/<stem>_{original,reconstructed,compare,compressed}.*`
+  - 现场 40 例清单 `manifest.csv`
+- 关键决策：
+  - 复原文件用 CSV；压缩文件用 `EWCR` 魔数二进制
+  - 大批波形 CSV 不提交 Git，只提交 README + manifest
+- 未决问题：尚未提供从 `.ewcr` 单独解码的 CLI
+- 相关文件/分支：`c/src/ewcr_io.c`、`c/results/out/`

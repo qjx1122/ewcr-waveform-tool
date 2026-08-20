@@ -169,7 +169,32 @@ typedef struct {
     double enc_s, dec_s;
     EwcrMetrics metrics;
     char note[160];
+    uint8_t *compressed;
+    int compressed_nbytes;
 } EwcrRunResult;
+
+typedef struct {
+    uint8_t *d;
+    size_t n, cap;
+} EwcrBuf;
+
+void ewcr_buf_init(EwcrBuf *b);
+void ewcr_buf_free(EwcrBuf *b);
+void ewcr_buf_u8(EwcrBuf *b, uint8_t v);
+void ewcr_buf_u32(EwcrBuf *b, uint32_t v);
+void ewcr_buf_i32(EwcrBuf *b, int32_t v);
+void ewcr_buf_f64(EwcrBuf *b, double v);
+void ewcr_buf_bytes(EwcrBuf *b, const void *p, size_t n);
+void ewcr_buf_str(EwcrBuf *b, const char *s);
+void ewcr_pack_header(EwcrBuf *b, uint8_t algo_id, int n, double fs, double f0, double bits_compressed);
+uint8_t ewcr_algo_id(const char *algo);
+
+int ewcr_write_wave_csv(const char *path, const double *x, int n, double fs);
+int ewcr_write_compare_csv(const char *path, const double *x, const double *xhat, int n, double fs);
+int ewcr_write_bytes(const char *path, const uint8_t *data, int nbytes);
+int ewcr_save_case_files(const char *dir, const char *stem, const double *x, const double *xhat,
+                         int n, double fs, const EwcrRunResult *r);
+void ewcr_result_release(EwcrRunResult *r);
 
 int asbc_codec_run(const double *x, int n, double fs, const AsbcOpts *opt,
                    double *xhat, EwcrRunResult *out);

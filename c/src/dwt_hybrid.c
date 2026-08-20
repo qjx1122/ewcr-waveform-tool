@@ -257,6 +257,22 @@ int dwt_codec_run(const double *x, int n, const DwtOpts *opt, double *xhat, Ewcr
     out->ok = 1;
     snprintf(out->note, sizeof(out->note), "L=%d nA=%d nz=%d", L, nA, nz_count);
 
+    {
+        EwcrBuf b;
+        ewcr_buf_init(&b);
+        ewcr_pack_header(&b, 2, n, 0.0, 50.0, bits_total);
+        ewcr_buf_u32(&b, (uint32_t)L);
+        ewcr_buf_u32(&b, (uint32_t)D.qbits);
+        ewcr_buf_u32(&b, (uint32_t)D.delta);
+        ewcr_buf_u32(&b, (uint32_t)nA);
+        ewcr_buf_u32(&b, (uint32_t)ncoef);
+        for (int i = 0; i <= L + 1; i++) ewcr_buf_i32(&b, book[i]);
+        for (int i = 0; i <= L; i++) ewcr_buf_f64(&b, scales[i]);
+        for (int i = 0; i < ncoef; i++) ewcr_buf_i32(&b, (int32_t)Cq[i]);
+        out->compressed = b.d;
+        out->compressed_nbytes = (int)b.n;
+    }
+
     free(C);
     free(Cq);
     free(scales);

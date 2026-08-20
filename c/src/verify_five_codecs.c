@@ -54,6 +54,7 @@ int main(int argc, char **argv)
     double *xhat = (double *)ewcr_xmalloc((size_t)nmax * sizeof(double));
 
     mkdir("results", 0755);
+    mkdir("results/out", 0755);
     mkdir("c/results", 0755);
     const char *csvpath = "results/verify_five_codecs.csv";
     FILE *csv = fopen(csvpath, "w");
@@ -99,6 +100,17 @@ int main(int argc, char **argv)
                         r.metrics.NMSE_dB, r.metrics.RMSE, r.metrics.PRD, r.metrics.MAXE,
                         r.metrics.PSNR_dB, r.enc_s, r.dec_s, r.note);
             }
+            if (ok) {
+                char algo_id[32];
+                snprintf(algo_id, sizeof(algo_id), "%s", algos[a]);
+                for (char *p = algo_id; *p; p++) if (*p == '-') *p = '_';
+                char stem[128];
+                snprintf(stem, sizeof(stem), "synth_%s_%s", signals_short[s], algo_id);
+                int nn = r.N > 0 ? r.N : n;
+                if (nn > n) nn = n;
+                ewcr_save_case_files("results/out", stem, x, xhat, nn, cfg.fs, &r);
+            }
+            ewcr_result_release(&r);
             fflush(stdout);
         }
     }

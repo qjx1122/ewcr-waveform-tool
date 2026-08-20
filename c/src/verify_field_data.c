@@ -77,6 +77,10 @@ int main(int argc, char **argv)
     const char *algos[] = {"ASBC", "DWT-Hybrid", "CS-OMP", "MMC", "SVDCS"};
 
     mkdir("results", 0755);
+    mkdir("results/out", 0755);
+    FILE *man = fopen("results/out/manifest.csv", "w");
+    if (man)
+        fprintf(man, "stem,file,channel,algo,original_csv,reconstructed_csv,compressed_ewcr,compressed_bytes\n");
     FILE *csv = fopen("results/verify_field_data.csv", "w");
     if (!csv) csv = fopen("c/results/verify_field_data.csv", "w");
     if (csv)
@@ -153,12 +157,30 @@ int main(int argc, char **argv)
                             r.metrics.similarity_pct, r.metrics.corr, r.metrics.SNR_dB,
                             r.metrics.NMSE_dB, r.metrics.RMSE, r.metrics.PRD, r.metrics.MAXE,
                             r.metrics.PSNR_dB, r.enc_s, r.dec_s, r.note);
+                if (ok) {
+                    char fileid[32];
+                    snprintf(fileid, sizeof(fileid), "%s", files[fi]);
+                    char *dot = strchr(fileid, '.');
+                    if (dot) *dot = 0;
+                    char algo_id[32];
+                    snprintf(algo_id, sizeof(algo_id), "%s", algos[a]);
+                    for (char *p = algo_id; *p; p++) if (*p == '-') *p = '_';
+                    char stem[128];
+                    snprintf(stem, sizeof(stem), "%s_%s_%s", fileid, chans[ci], algo_id);
+                    ewcr_save_case_files("results/out", stem, x, xhat, nuse, w.fs, &r);
+                    if (man)
+                        fprintf(man, "%s,%s,%s,%s,results/out/%s_original.csv,results/out/%s_reconstructed.csv,results/out/%s_compressed.ewcr,%d\n",
+                                stem, files[fi], chans[ci], algos[a], stem, stem, stem,
+                                r.compressed_nbytes);
+                }
+                ewcr_result_release(&r);
             }
         }
         free(xhat);
         ewcr_free_wave_csv(&w);
     }
     if (csv) fclose(csv);
+    if (man) fclose(man);
     printf("\nRan %d field cases, %d failed.\n", nrun, nfail);
     if (nfail == 0) {
         printf("Field-data five-codec verification PASSED.\n");

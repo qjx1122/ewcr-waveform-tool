@@ -687,6 +687,44 @@ int mmc_codec_run(const double *x, int n, const MmcOpts *opt, double *xhat, Ewcr
     out->ok = 1;
     snprintf(out->note, sizeof(out->note), "windows=%d N=%d last=%s/%s", W, N, pk[W - 1].model.name,
              pk[W - 1].residual.name);
+
+    {
+        EwcrBuf b;
+        ewcr_buf_init(&b);
+        ewcr_pack_header(&b, 4, nuse, D.fs, D.fn, (double)bits_sum);
+        ewcr_buf_u32(&b, (uint32_t)W);
+        ewcr_buf_u32(&b, (uint32_t)N);
+        for (int w = 0; w < W; w++) {
+            MmcPacket *p = &pk[w];
+            ewcr_buf_str(&b, p->model.name);
+            ewcr_buf_str(&b, p->model.family);
+            ewcr_buf_str(&b, p->model.base_family);
+            ewcr_buf_i32(&b, p->model.order);
+            ewcr_buf_i32(&b, p->model.eta);
+            ewcr_buf_i32(&b, p->model.factor);
+            ewcr_buf_i32(&b, p->model.p);
+            ewcr_buf_i32(&b, p->kx);
+            ewcr_buf_i32(&b, p->nx);
+            for (int i = 0; i < MMC_MAX_THETA; i++) {
+                ewcr_buf_f64(&b, p->theta_q[i]);
+                ewcr_buf_f64(&b, p->model.theta_center[i]);
+                ewcr_buf_f64(&b, p->model.theta_width[i]);
+            }
+            ewcr_buf_str(&b, p->residual.name);
+            ewcr_buf_str(&b, p->residual.transform);
+            ewcr_buf_i32(&b, p->residual.kr);
+            ewcr_buf_i32(&b, p->residual.nbits);
+            ewcr_buf_i32(&b, p->residual.nsel);
+            ewcr_buf_i32(&b, p->residual.value_bits);
+            for (int i = 0; i < p->residual.nsel; i++) {
+                ewcr_buf_i32(&b, p->residual.indices[i]);
+                ewcr_buf_i32(&b, p->residual.q[i]);
+            }
+        }
+        out->compressed = b.d;
+        out->compressed_nbytes = (int)b.n;
+    }
+
     free(pk);
     return 0;
 }

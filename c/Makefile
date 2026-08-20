@@ -7,6 +7,7 @@ LDLIBS  ?= -lm
 LIB_SRC := \
 	src/ewcr_math.c \
 	src/ewcr_signals.c \
+	src/ewcr_io.c \
 	src/asbc.c \
 	src/dwt_hybrid.c \
 	src/cs_omp.c \

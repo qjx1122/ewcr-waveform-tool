@@ -297,6 +297,48 @@ int asbc_codec_run(const double *x, int n, double fs, const AsbcOpts *opt,
     out->ok = 1;
     snprintf(out->note, sizeof(out->note), "F0=%.4f K=%d nb=%d blk=%d", F0, K, nb, blk);
 
+    {
+        EwcrBuf b;
+        ewcr_buf_init(&b);
+        ewcr_pack_header(&b, 1, n, fs, F0, bits_total);
+        ewcr_buf_f64(&b, F0);
+        ewcr_buf_f64(&b, scale);
+        ewcr_buf_f64(&b, qstep);
+        ewcr_buf_f64(&b, W);
+        ewcr_buf_u32(&b, (uint32_t)D.Rk);
+        ewcr_buf_u32(&b, (uint32_t)blk);
+        ewcr_buf_u32(&b, (uint32_t)nb);
+        ewcr_buf_u32(&b, (uint32_t)K);
+        ewcr_buf_u32(&b, (uint32_t)Sk);
+        for (int i = 0; i < nb * K; i++) ewcr_buf_u8(&b, (uint8_t)mask_h[i]);
+        for (int i = 0; i < nb; i++) ewcr_buf_u8(&b, (uint8_t)mask_e[i]);
+        for (int i = 0; i < nb * K; i++) {
+            int ns = sub_len[i];
+            ewcr_buf_u32(&b, (uint32_t)ns);
+            if (mask_h[i] && sub_data[i]) {
+                for (int j = 0; j < ns; j++) {
+                    ewcr_buf_f64(&b, sub_data[i][j].re);
+                    ewcr_buf_f64(&b, sub_data[i][j].im);
+                }
+            }
+        }
+        for (int i = 0; i < nb; i++) {
+            if (!mask_e[i]) {
+                ewcr_buf_u32(&b, 0);
+                continue;
+            }
+            ewcr_buf_u32(&b, (uint32_t)e_fft[i].nidx);
+            ewcr_buf_f64(&b, e_fft[i].qe);
+            for (int j = 0; j < e_fft[i].nidx; j++) {
+                ewcr_buf_i32(&b, e_fft[i].idx[j]);
+                ewcr_buf_f64(&b, e_fft[i].Re[j]);
+                ewcr_buf_f64(&b, e_fft[i].Im[j]);
+            }
+        }
+        out->compressed = b.d;
+        out->compressed_nbytes = (int)b.n;
+    }
+
     for (int i = 0; i < nb * K; i++) free(sub_data[i]);
     for (int b = 0; b < nb; b++) {
         free(e_fft[b].idx);

@@ -171,6 +171,21 @@ int cs_omp_codec_run(const double *x, int n, const CsOpts *opt, double *xhat, Ew
     out->ok = 1;
     snprintf(out->note, sizeof(out->note), "M=%d N=%d K0=%d", M, N, D.K0);
 
+    {
+        EwcrBuf b;
+        ewcr_buf_init(&b);
+        ewcr_pack_header(&b, 3, N, 0.0, 50.0, bits_total);
+        ewcr_buf_u32(&b, (uint32_t)M);
+        ewcr_buf_u32(&b, (uint32_t)D.K0);
+        ewcr_buf_i32(&b, D.seed);
+        ewcr_buf_u32(&b, (uint32_t)D.ybits);
+        ewcr_buf_f64(&b, D.tol);
+        ewcr_buf_f64(&b, yscale);
+        for (int i = 0; i < M; i++) ewcr_buf_i32(&b, yq[i]);
+        out->compressed = b.d;
+        out->compressed_nbytes = (int)b.n;
+    }
+
     free(Phi);
     free(A);
     free(y);
