@@ -1,5 +1,6 @@
 #include "ewcr.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -117,4 +118,112 @@ int ewcr_gen_ieee1159(const char *kind, double fs, int cycles, double *x, int *n
     free(base);
     free(seg);
     return 0;
+}
+
+static double parse_tod_seconds(const char *ts)
+{
+    const char *p = strrchr(ts, ' ');
+    p = p ? p + 1 : ts;
+    int h = 0, m = 0;
+    double s = 0.0;
+    if (sscanf(p, "%d:%d:%lf", &h, &m, &s) != 3) return NAN;
+    return (double)h * 3600.0 + (double)m * 60.0 + s;
+}
+
+int ewcr_load_wave_csv(const char *path, EwcrWaveCsv *w)
+{
+    memset(w, 0, sizeof(*w));
+    strncpy(w->path, path, sizeof(w->path) - 1);
+    FILE *fp = fopen(path, "r");
+    if (!fp) return -1;
+    char line[1024];
+    if (!fgets(line, sizeof(line), fp)) {
+        fclose(fp);
+        return -2;
+    }
+    int cap = 4096;
+    int n = 0;
+    double *ch[6];
+    double *tod = (double *)ewcr_xmalloc((size_t)cap * sizeof(double));
+    for (int c = 0; c < 6; c++) ch[c] = (double *)ewcr_xmalloc((size_t)cap * sizeof(double));
+    while (fgets(line, sizeof(line), fp)) {
+        if (line[0] == '\0' || line[0] == '\n' || line[0] == '\r') continue;
+        char *tok = strtok(line, ",");
+        if (!tok) continue;
+        double t = parse_tod_seconds(tok);
+        double v[6];
+        int got = 0;
+        for (int c = 0; c < 6; c++) {
+            tok = strtok(NULL, ",");
+            if (!tok || tok[0] == '\0' || tok[0] == '\n') {
+                v[c] = 0.0;
+            } else {
+                v[c] = strtod(tok, NULL);
+                got++;
+            }
+        }
+        if (got < 1) continue;
+        if (n >= cap) {
+            cap *= 2;
+            tod = (double *)realloc(tod, (size_t)cap * sizeof(double));
+            for (int c = 0; c < 6; c++) ch[c] = (double *)realloc(ch[c], (size_t)cap * sizeof(double));
+            if (!tod) {
+                fprintf(stderr, "csv realloc failed\n");
+                exit(2);
+            }
+        }
+        tod[n] = t;
+        for (int c = 0; c < 6; c++) ch[c][n] = v[c];
+        n++;
+    }
+    fclose(fp);
+    if (n < 8) {
+        free(tod);
+        for (int c = 0; c < 6; c++) free(ch[c]);
+        return -3;
+    }
+    double acc = 0.0;
+    int ndt = 0;
+    for (int i = 1; i < n && i < 2000; i++) {
+        double d = tod[i] - tod[i - 1];
+        if (d > 1e-9 && d < 0.1) {
+            acc += d;
+            ndt++;
+        }
+    }
+    free(tod);
+    double dt = (ndt > 0) ? (acc / ndt) : 1e-4;
+    w->fs = 1.0 / dt;
+    w->n = n;
+    w->UA = ch[0];
+    w->IA = ch[1];
+    w->UB = ch[2];
+    w->IB = ch[3];
+    w->UC = ch[4];
+    w->IC = ch[5];
+    return 0;
+}
+
+void ewcr_free_wave_csv(EwcrWaveCsv *w)
+{
+    if (!w) return;
+    free(w->UA);
+    free(w->IA);
+    free(w->UB);
+    free(w->IB);
+    free(w->UC);
+    free(w->IC);
+    memset(w, 0, sizeof(*w));
+}
+
+const double *ewcr_wave_channel(const EwcrWaveCsv *w, const char *name)
+{
+    if (!w || !name) return NULL;
+    if (strcmp(name, "UA") == 0) return w->UA;
+    if (strcmp(name, "IA") == 0) return w->IA;
+    if (strcmp(name, "UB") == 0) return w->UB;
+    if (strcmp(name, "IB") == 0) return w->IB;
+    if (strcmp(name, "UC") == 0) return w->UC;
+    if (strcmp(name, "IC") == 0) return w->IC;
+    return NULL;
 }

@@ -17,7 +17,8 @@ IEEE Std 1159 test signals, FFT/DCT/Haar/db4 DWT, Huffman and 12-bit LZW live in
 ```bash
 cd c
 make
-make test          # or: ./build/verify_five_codecs
+make test          # IEEE 1159 synthetic: ./build/verify_five_codecs
+make test-data     # field CSV in ../data: ./build/verify_field_data
 ```
 
 `make test` runs:
@@ -26,7 +27,9 @@ make test          # or: ./build/verify_five_codecs
 2. Encode→decode for all **five algorithms** on IEEE 1159 `pure` / `sag` / `harmonics` / `complex` (2 cycles @ 12.8 kHz)
 3. A longer pure sinusoid (4 cycles) for all five codecs
 
-CSV: `c/results/verify_five_codecs.csv`
+`make test-data` loads `data/wave1.csv` … `wave4.csv` (10 kHz, three-phase UA/IA/UB/IB/UC/IC), takes 10 cycles of **UA** and **IA** after skipping the first cycle, and runs the same five codecs. SVDCS `signal_scale` is set to the segment peak so 16-bit p.u. quantizers do not clip field voltages.
+
+CSV: `c/results/verify_five_codecs.csv`, `c/results/verify_field_data.csv`
 
 A case PASSes when reconstruction is finite, `CR > 0`, `SNR` is finite, and SNR on a pure sinusoid is at least 12 dB. SVDCS also checks the LZW payload round-trip.
 

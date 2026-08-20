@@ -113,7 +113,8 @@ run_all_experiments
 A toolbox-free C11 translation of the five codecs (ASBC, DWT-Hybrid, CS-OMP, MMC, SVDCS) lives in `../c`. Build and run the encode/decode verification with:
 
 ```bash
-cd ../c && make test
+cd ../c && make test        # IEEE 1159 synthetic
+cd ../c && make test-data   # field CSV in ../data
 ```
 
 See `../c/README.md`.

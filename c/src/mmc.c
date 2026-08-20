@@ -513,6 +513,7 @@ static int encode_window(const double *x, int N, MmcState *st, const MmcOpts *cf
 
     int M = nm;
     const char *rmethods[3] = {"none", "DCT", "DWT"};
+    int haar_ok = (N > 1) && ((N & (N - 1)) == 0);
     int Lr = 3;
     int nmb = (int)ceil(log2((double)M));
     if (nmb < 1) nmb = 1;
@@ -565,6 +566,7 @@ static int encode_window(const double *x, int N, MmcState *st, const MmcOpts *cf
 
             for (int il = 0; il < Lr; il++) {
                 const char *rname = rmethods[il];
+                if (!haar_ok && strcmp(rname, "DWT") == 0) continue;
                 int nkr = 0, nnr = 0;
                 if (strcmp(rname, "none") != 0) {
                     nkr = cfg->n_kr;

@@ -20,3 +20,18 @@
   - 未把 exp1–exp6 全套扫频搬到 C
   - DWT 使用周期延拓 db4，不是 MATLAB `wavedec` 默认 `sym` 延拓
   - 本环境无 MATLAB，无法做 C vs MATLAB 逐样本 bit-identical 对照
+
+## [2026-08-20] 专题：现场 CSV（data/）五算法验证
+- 类型：验证专题
+- 目标与假设：用仓库 `data/wave1..4.csv` 真实电气波形，对 C 移植的五算法做 encode→decode 闭环
+- 方法 / 数据 / 参数：
+  - 数据：10 kHz，约 5–10 s，列 timestamp,UA,IA,UB,IB,UC,IC；电压峰值约 330 V，电流约 1 A
+  - 片段：跳过第 1 个 50 Hz 周期后取 10 周期（N=2000）的 UA 与 IA
+  - 入口：`c/src/verify_field_data.c`，`make test-data`
+  - MMC 窗 N=200（非 2 幂）只用 none/DCT 残差；SVDCS `signal_scale`=片段峰值
+- 结果 / 结论：
+  - 40/40 通过（4 文件 × 2 通道 × 5 算法）
+  - 电压 UA：MMC CR≈16.6–16.9、SNR≈43–46 dB；DWT SNR≈48–49 dB；ASBC CR≈11–15、SNR≈27 dB；CS-OMP CR=4.88、SNR≈43–46 dB；SVDCS SNR≈39–46 dB
+  - 电流 IA：SNR 普遍低于电压（ASBC 约 15–24 dB，其余约 28–45 dB），CR 模式与电压类似
+- 是否进入 REPORT.md（稳定结论）：否
+- 遗留问题：未覆盖 B/C 相与整段长记录；ASBC F0 栅格偏差

@@ -98,6 +98,17 @@ void ewcr_unified_metrics(const double *x, const double *xhat, int n,
 
 int ewcr_gen_ieee1159(const char *kind, double fs, int cycles, double *x, int *n_out);
 
+typedef struct {
+    char path[512];
+    double fs;
+    int n;
+    double *UA, *IA, *UB, *IB, *UC, *IC;
+} EwcrWaveCsv;
+
+int ewcr_load_wave_csv(const char *path, EwcrWaveCsv *w);
+void ewcr_free_wave_csv(EwcrWaveCsv *w);
+const double *ewcr_wave_channel(const EwcrWaveCsv *w, const char *name);
+
 /* ---- codec options ------------------------------------------------------ */
 typedef struct {
     double W, act_thresh, energy_frac;
