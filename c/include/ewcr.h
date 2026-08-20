@@ -61,6 +61,7 @@ int ewcr_ls_solve(const double *A, int m, int n, const double *b, double *x);
 int ewcr_ls_solve_cpx(const cpx *A, int m, int n, const cpx *b, cpx *x);
 
 void ewcr_db4_filters(double *lod, double *hid, double *lor, double *hir);
+int ewcr_db4_max_ncoef(int n, int L);
 int ewcr_wavedec_db4(const double *x, int n, int L, double *C, int *book, int *ncoef);
 int ewcr_waverec_db4(const double *C, const int *book, int L, double *x);
 
@@ -131,6 +132,7 @@ typedef struct {
     double M_ratio, tol;
     int K0, seed, ybits, RQ;
     double fs, f0;      /* metrics only; 0 => 12800 / 50 */
+    char basis[8];      /* "dft" (default, benchmark) or "dct" */
 } CsOpts;
 
 typedef struct {

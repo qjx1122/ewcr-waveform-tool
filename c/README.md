@@ -71,5 +71,7 @@ Primary columns (original `x` vs reconstructed `xhat`):
 
 - **ASBC / MMC / SVDCS** share the MATLAB architecture, bit accounting, and (for MMC/SVDCS) reconstruction SNR on these records.
 - **CS-OMP** CR is analytic in `(N, M/N, ybits)` and matches; Φ uses a local xorshift+Box-Muller, not MATLAB `rng(42)+randn`, so SNR is close but not identical.
-- **DWT-Hybrid** is C encoder/decoder consistent but **not** MATLAB-identical: periodized db4 vs MATLAB `wavedec` default `sym` extension. Short records can have CR `< 1` from Huffman headers.
-- `interpft` (ASBC baseband upsample) uses MATLAB `ceil((m+1)/2)` Nyquist splitting. An earlier C integer `(m+1)/2` split DC on even `m` and collapsed 4-cycle pure-ASBC SNR from ~300 dB to ~102 dB; that is fixed.
+- **DWT-Hybrid** follows the same stages (db4 DWT → energy/universal threshold → quant → delta → Huffman) with **periodized** db4 (perfect reconstruction). MATLAB `wavedec` default `dwtmode` is `'sym'`, so DWT CR is not identical; C encode/decode is self-consistent.
+- CS-OMP also implements MATLAB `basis='dct'` (`dctmtx`); the benchmark default remains `'dft'`. Φ still uses a local RNG, not MATLAB `mt19937ar` + ziggurat `randn`.
+- SVDCS implements MATLAB `sync_mode` `'nominal'` (benchmark) and `'zero_cross'`.
+- `interpft` (ASBC baseband upsample) uses MATLAB `ceil((m+1)/2)` Nyquist splitting.

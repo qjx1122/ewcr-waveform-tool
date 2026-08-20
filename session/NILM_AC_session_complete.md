@@ -101,3 +101,16 @@
   - 纯正弦 ASBC 10 周期 SNR 266 vs MATLAB 294 dB（CR 已精确一致）
   - 无独立 `.ewcr` 解码 CLI
 - 相关文件/分支：`c/src/ewcr_math.c`、`c/src/verify_five_codecs.c`、`c/README.md`、`arena/01a01e0b-ewcr-waveform-tool`
+
+## [2026-08-20] 会话纪要
+- 目标：分析 MATLAB 整体功能，并保证 C 与 MATLAB 功能一致
+- 完成项：
+  - 梳理 MATLAB：五编码器、统一 runner/指标、IEEE 1159、exp1–exp6（扫频/噪声/资源/载荷清单）
+  - 以 exp1 固定工作点核对 C：ASBC/MMC/SVDCS CR+SNR 对齐；CS-OMP CR 对齐
+  - CS-OMP 增加 DCT 字典；SVDCS 增加过零同步（与 MATLAB opts 一致）
+  - 尝试 MATLAB `wavedec` `'sym'` 延拓，PR 未过关，保持周期延拓 db4
+- 关键决策：
+  - 「功能完全一致」对齐 `run_codec_unified`+`benchmark_config`，不移植 exp2–exp6 作图
+  - DWT 不以错误的 sym 实现换掉已验证的周期延拓 PR
+- 未决问题：DWT CR 因延拓不同无法与 MATLAB 表逐位相同；CS-OMP Φ 非 MATLAB rng
+- 相关文件/分支：`c/src/{ewcr_math,cs_omp,svdcs}.c`、`c/README.md`、`arena/01a01e0b-ewcr-waveform-tool`

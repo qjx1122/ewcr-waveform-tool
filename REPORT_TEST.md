@@ -82,3 +82,18 @@
   - 现场 `data/` 120/120 仍 PASS
 - 是否进入 REPORT.md（稳定结论）：否
 - 遗留问题：纯正弦 ASBC 10 周期 SNR 266 vs 294 dB（均为数值无损，CR 已对齐）；DWT 若要对齐 MATLAB CR 需改延拓
+
+## [2026-08-20] 专题：MATLAB 全工程功能 vs C 对齐
+- 类型：验证专题
+- 目标与假设：C 应实现 MATLAB 五算法编解码功能（同一工作点、同一码率公式、同一重构链路）
+- 方法 / 数据 / 参数：
+  - MATLAB 入口 `run_all_experiments` → exp1 固定场景为金标准
+  - C：`make test` 10 周期对照 `exp1_fixed_scenarios.csv`
+- 结果 / 结论：
+  - MATLAB 功能 = 五编码器 + 统一指标 + IEEE 1159 + 六组实验（RD/时长/噪声/耗时/载荷）。C 覆盖五编码器闭环与 exp1 工作点，不覆盖 exp2–exp6 扫频作图。
+  - ASBC/MMC/SVDCS：CR 与 MATLAB 表精确一致；MMC/SVDCS SNR 精确一致；ASBC 扰动场景 SNR 一致，纯正弦均为数值无损。
+  - CS-OMP：CR 精确一致；已实现 DFT（默认）与 DCT 字典；Φ 的 RNG 不同故 SNR 接近而非相同。
+  - DWT-Hybrid：阶段与 MATLAB 相同（db4→阈值→量化→delta→Huffman）；延拓为周期而非 `'sym'`，CR 不同，C 闭环 SNR 可用。
+  - SVDCS 已实现 `'nominal'` 与 `'zero_cross'` 同步。
+- 是否进入 REPORT.md（稳定结论）：否
+- 遗留问题：无 MATLAB Wavelet Toolbox 环境下的 `'sym'` 逐样本金标；CS-OMP 无法复现 MATLAB ziggurat `randn`

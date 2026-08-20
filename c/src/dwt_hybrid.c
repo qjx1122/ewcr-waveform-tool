@@ -113,11 +113,11 @@ int dwt_codec_run(const double *x, int n, const DwtOpts *opt, double *xhat, Ewcr
     if (L < 1) L = 1;
     while (L > 1 && (n >> L) * (1 << L) != n) L--;
     if ((n >> L) << L != n) {
-        /* trim L until n divisible by 2^L */
         while (L > 1 && (n % (1 << L)) != 0) L--;
     }
 
-    double *C = (double *)ewcr_xcalloc((size_t)n, sizeof(double));
+    int cap = ewcr_db4_max_ncoef(n, L);
+    double *C = (double *)ewcr_xcalloc((size_t)cap, sizeof(double));
     int book[32];
     int ncoef = 0;
     if (ewcr_wavedec_db4(x, n, L, C, book, &ncoef) != 0) {

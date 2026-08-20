@@ -87,7 +87,7 @@ static void omp_recover(const cpx *A, int M, int N, const cpx *y, int K0, double
 
 static void form_A_dft(const double *Phi, int M, int N, cpx *A)
 {
-    /* A[m,k] = DFT_k(Phi[m,:]) / sqrt(N) */
+    /* A[m,k] = DFT_k(Phi[m,:]) / sqrt(N)  == Phi * (dftmtx/sqrt(N)) */
     double s = 1.0 / sqrt((double)N);
     cpx *row = (cpx *)ewcr_xmalloc((size_t)N * sizeof(cpx));
     for (int m = 0; m < M; m++) {
@@ -98,14 +98,40 @@ static void form_A_dft(const double *Phi, int M, int N, cpx *A)
     free(row);
 }
 
-static void psi_times_s(const cpx *s, int N, double *xhat)
+static void form_A_dct(const double *Phi, int M, int N, cpx *A)
 {
+    /* MATLAB: Psi = dctmtx(N); A = Phi * Psi. T[row,col] = T[row*N+col]. */
+    double *T = (double *)ewcr_xmalloc((size_t)N * (size_t)N * sizeof(double));
+    ewcr_dct_matrix(T, N);
+    for (int m = 0; m < M; m++) {
+        for (int k = 0; k < N; k++) {
+            double s = 0.0;
+            const double *phi = Phi + (size_t)m * N;
+            for (int i = 0; i < N; i++) s += phi[i] * T[(size_t)i * N + k];
+            A[m * N + k] = cpx_make(s, 0);
+        }
+    }
+    free(T);
+}
+
+static void psi_times_s_dft(const cpx *s, int N, double *xhat)
+{
+    /* xhat = (dftmtx/sqrt(N)) * s = FFT(s)/sqrt(N) */
     cpx *tmp = (cpx *)ewcr_xmalloc((size_t)N * sizeof(cpx));
     memcpy(tmp, s, (size_t)N * sizeof(cpx));
     ewcr_fft(tmp, N, 0);
     double sc = 1.0 / sqrt((double)N);
     for (int i = 0; i < N; i++) xhat[i] = tmp[i].re * sc;
     free(tmp);
+}
+
+static void psi_times_s_dct(const cpx *s, int N, double *xhat)
+{
+    /* xhat = dctmtx(N) * s = orthonormal DCT-II of s */
+    double *sr = (double *)ewcr_xmalloc((size_t)N * sizeof(double));
+    for (int i = 0; i < N; i++) sr[i] = s[i].re;
+    ewcr_dct_fwd(sr, xhat, N);
+    free(sr);
 }
 
 int cs_omp_codec_run(const double *x, int n, const CsOpts *opt, double *xhat, EwcrRunResult *out)
@@ -120,7 +146,9 @@ int cs_omp_codec_run(const double *x, int n, const CsOpts *opt, double *xhat, Ew
     D.seed = 42;
     D.ybits = 16;
     D.RQ = 16;
+    strcpy(D.basis, "dft");
     if (opt) D = *opt;
+    if (D.basis[0] == '\0') strcpy(D.basis, "dft");
     double t0 = ewcr_now_s();
 
     int N = n;
@@ -134,8 +162,10 @@ int cs_omp_codec_run(const double *x, int n, const CsOpts *opt, double *xhat, Ew
     double ism = 1.0 / sqrt((double)M);
     for (int i = 0; i < M * N; i++) Phi[i] = ewcr_rng_randn(&rng) * ism;
 
+    int use_dct = (strcmp(D.basis, "dct") == 0);
     cpx *A = (cpx *)ewcr_xmalloc((size_t)M * (size_t)N * sizeof(cpx));
-    form_A_dft(Phi, M, N, A);
+    if (use_dct) form_A_dct(Phi, M, N, A);
+    else form_A_dft(Phi, M, N, A);
 
     cpx *y = (cpx *)ewcr_xcalloc((size_t)M, sizeof(cpx));
     for (int m = 0; m < M; m++) {
@@ -168,7 +198,8 @@ int cs_omp_codec_run(const double *x, int n, const CsOpts *opt, double *xhat, Ew
 
     cpx *s_hat = (cpx *)ewcr_xcalloc((size_t)N, sizeof(cpx));
     omp_recover(A, M, N, ydec, D.K0, D.tol, s_hat);
-    psi_times_s(s_hat, N, xhat);
+    if (use_dct) psi_times_s_dct(s_hat, N, xhat);
+    else psi_times_s_dft(s_hat, N, xhat);
     double t2 = ewcr_now_s();
 
     double fs = (D.fs > 0.0) ? D.fs : 12800.0;

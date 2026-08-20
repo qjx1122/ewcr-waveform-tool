@@ -470,7 +470,7 @@ int ewcr_ls_solve_cpx(const cpx *A, int m, int n, const cpx *b, cpx *x)
 
 void ewcr_db4_filters(double *lod, double *hid, double *lor, double *hir)
 {
-    /* Orthonormal db4 taps (same analysis/synthesis pair, periodized PR). */
+    /* Orthonormal db4. Periodized analysis/synthesis uses the same taps. */
     static const double h[8] = {
         0.23037781330885523,
         0.7148465705525415,
@@ -490,13 +490,19 @@ void ewcr_db4_filters(double *lod, double *hid, double *lor, double *hir)
     }
 }
 
-static void dwt1_per(const double *x, int n, const double *lod, const double *hid, int L,
+int ewcr_db4_max_ncoef(int n, int L)
+{
+    (void)L;
+    return n + 16;
+}
+
+static void dwt1_per(const double *x, int n, const double *lod, const double *hid, int lf,
                      double *a, double *d)
 {
     int n2 = n / 2;
     for (int i = 0; i < n2; i++) {
         double sa = 0.0, sd = 0.0;
-        for (int k = 0; k < L; k++) {
+        for (int k = 0; k < lf; k++) {
             int idx = (2 * i - k) % n;
             if (idx < 0) idx += n;
             sa += lod[k] * x[idx];
@@ -508,12 +514,12 @@ static void dwt1_per(const double *x, int n, const double *lod, const double *hi
 }
 
 static void idwt1_per(const double *a, const double *d, int n2, const double *lor, const double *hir,
-                      int L, double *x)
+                      int lf, double *x)
 {
     int n = n2 * 2;
     memset(x, 0, (size_t)n * sizeof(double));
     for (int i = 0; i < n2; i++) {
-        for (int k = 0; k < L; k++) {
+        for (int k = 0; k < lf; k++) {
             int idx = (2 * i - k) % n;
             if (idx < 0) idx += n;
             x[idx] += lor[k] * a[i] + hir[k] * d[i];
@@ -541,13 +547,12 @@ int ewcr_wavedec_db4(const double *x, int n, int L, double *C, int *book, int *n
         double *a = (double *)ewcr_xmalloc((size_t)n2 * sizeof(double));
         double *d = (double *)ewcr_xmalloc((size_t)n2 * sizeof(double));
         dwt1_per(cur, cur_n, lod, hid, 8, a, d);
-        details[lev] = d; /* level 1 stored first; MATLAB book is cD_L ... cD_1 */
+        details[lev] = d;
         dlen[lev] = n2;
         free(cur);
         cur = a;
         cur_n = n2;
     }
-    /* Pack MATLAB-style: cA_L, cD_L, ..., cD_1 */
     int pos = 0;
     book[0] = cur_n;
     memcpy(C + pos, cur, (size_t)cur_n * sizeof(double));
@@ -954,6 +959,8 @@ void ewcr_default_cfg(EwcrBenchCfg *cfg)
     cfg->dwt.qbits = 8;
     cfg->dwt.delta = 1;
     cfg->dwt.RQ = 16;
+    cfg->dwt.fs = cfg->fs;
+    cfg->dwt.f0 = cfg->f0;
 
     cfg->cs.M_ratio = 0.20;
     cfg->cs.K0 = 48;
@@ -961,6 +968,9 @@ void ewcr_default_cfg(EwcrBenchCfg *cfg)
     cfg->cs.seed = 42;
     cfg->cs.ybits = 16;
     cfg->cs.RQ = 16;
+    cfg->cs.fs = cfg->fs;
+    cfg->cs.f0 = cfg->f0;
+    strcpy(cfg->cs.basis, "dft");
 
     cfg->mmc.fs = cfg->fs;
     cfg->mmc.fn = cfg->f0;
@@ -1146,11 +1156,12 @@ int ewcr_unit_tests(int verbose)
         free(c);
         free(y);
     }
-    /* db4 PR */
+    /* db4 periodized PR */
     {
         int n = 256, L = 4, ncoef = 0;
+        int cap = ewcr_db4_max_ncoef(n, L);
         double *x = (double *)ewcr_xmalloc((size_t)n * sizeof(double));
-        double *C = (double *)ewcr_xmalloc((size_t)n * sizeof(double));
+        double *C = (double *)ewcr_xmalloc((size_t)cap * sizeof(double));
         double *y = (double *)ewcr_xmalloc((size_t)n * sizeof(double));
         int book[16];
         for (int i = 0; i < n; i++) x[i] = sin(2 * M_PI * 5 * i / (double)n);

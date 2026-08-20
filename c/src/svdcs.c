@@ -78,6 +78,52 @@ static int prepare_cycles_nominal(const double *x, int n, const SvdcsOpts *cfg, 
     return 0;
 }
 
+static int prepare_cycles_zero_cross(const double *x, int n, const SvdcsOpts *cfg, double *frames,
+                                     int *nframes)
+{
+    int M = cfg->Nppc;
+    double Tnom = cfg->fs / cfg->f0;
+    int *idx = (int *)ewcr_xmalloc((size_t)n * sizeof(int));
+    int nz = 0;
+    for (int i = 0; i < n - 1; i++) {
+        if (x[i] <= 0.0 && x[i + 1] > 0.0) idx[nz++] = i;
+    }
+    if (nz < 2) {
+        free(idx);
+        return -1;
+    }
+    double *zc = (double *)ewcr_xmalloc((size_t)nz * sizeof(double));
+    for (int k = 0; k < nz; k++) {
+        int i = idx[k];
+        double den = x[i + 1] - x[i];
+        double frac = (fabs(den) < 1e-30) ? 0.0 : (-x[i] / den);
+        zc[k] = (double)(i + 1) + frac;
+    }
+    free(idx);
+    int nkeep = 1;
+    double last = zc[0];
+    for (int k = 1; k < nz; k++) {
+        if (zc[k] - last < 0.55 * Tnom) continue;
+        zc[nkeep++] = zc[k];
+        last = zc[k];
+    }
+    int nF = 0;
+    for (int k = 0; k + 1 < nkeep; k++) {
+        double d = zc[k + 1] - zc[k];
+        if (!(d > 0.55 * Tnom && d < 1.60 * Tnom)) continue;
+        double a = zc[k], b = zc[k + 1];
+        for (int i = 0; i < M; i++) {
+            double tq = a + (double)i * (b - a) / (double)M;
+            frames[nF * M + i] = lagrange_one(x, n, tq, cfg->lagrange_order);
+        }
+        nF++;
+    }
+    free(zc);
+    if (nF < 1) return -1;
+    *nframes = nF;
+    return 0;
+}
+
 /* 12-bit LZW */
 static uint8_t *pack12(const uint16_t *codes, int n, int *nbytes)
 {
@@ -446,11 +492,18 @@ int svdcs_codec_run(const double *x, int n, const SvdcsOpts *opt, double *xhat, 
     if (maxF < 4) maxF = 4;
     double *frames = (double *)ewcr_xmalloc((size_t)maxF * (size_t)M * sizeof(double));
     int nF = 0;
-    if (prepare_cycles_nominal(xpu, n, &D, frames, &nF) != 0) {
-        snprintf(out->note, sizeof(out->note), "sync failed");
-        free(xpu);
-        free(frames);
-        return -1;
+    {
+        int rc_sync;
+        if (strcmp(D.sync_mode, "zero_cross") == 0)
+            rc_sync = prepare_cycles_zero_cross(xpu, n, &D, frames, &nF);
+        else
+            rc_sync = prepare_cycles_nominal(xpu, n, &D, frames, &nF);
+        if (rc_sync != 0) {
+            snprintf(out->note, sizeof(out->note), "sync failed");
+            free(xpu);
+            free(frames);
+            return -1;
+        }
     }
     int Q = 2 * M;
     double *Afloat = (double *)ewcr_xcalloc((size_t)nF * Q, sizeof(double));
