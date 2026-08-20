@@ -16,3 +16,20 @@
   - 用户尚未给出本会话的实质性开发任务
   - 沙箱缺少 MATLAB R2025b 与 Wavelet/Signal/Communications Toolbox
 - 相关文件/分支：`BOOTSTRAP.md`、`STATUS.md`、`session/NILM_AC_session_complete.md`、`arena/01a01e0b-ewcr-waveform-tool`
+
+## [2026-08-20] 会话纪要
+- 目标：把 `matlab/` 下五算法转换成 C，并用五算法做验证测试
+- 完成项：
+  - 新增 `c/`：ASBC / DWT-Hybrid / CS-OMP / MMC / SVDCS 编解码 + IEEE 1159 信号 + 验证入口
+  - `make test`：8 内核单测 + 4 信号×5 算法（2 周期）+ 纯正弦 4 周期，共 25 例全部 PASS
+  - 纯正弦 MMC 与 MATLAB 参考 CR/SNR 对齐；ASBC/CS/SVDCS 高 SNR 重构
+  - 写入 `c/results/verify_five_codecs.csv`、`c/README.md`、`REPORT_TEST.md`
+- 关键决策：
+  - 不依赖 MATLAB/FFTW：自实现 FFT、DCT、Haar、db4、Huffman、LZW
+  - 验证是 C 编码器/C 解码器闭环，不要求与 MATLAB bit-identical
+  - db4 采用周期延拓正交滤波器组（与 MATLAB `wavedec` 默认 `sym` 不同）
+  - CS-OMP 测量矩阵用本地 RNG，CR 公式与 MATLAB 相同（只依赖 M、ybits）
+- 未决问题：
+  - 未移植 exp1–exp6 全套实验
+  - 短窗 DWT/SVDCS 的 CR 受头开销影响可小于 1
+- 相关文件/分支：`c/`、`matlab/README.md`、`REPORT_TEST.md`、`arena/01a01e0b-ewcr-waveform-tool`
