@@ -1,0 +1,9 @@
+MATLAB version: 25.2.0.2998904 (R2025b)
+Computer: PCWIN64
+Arch: win64
+Timestamp: 2026-08-20 13:10:31
+PROCESSOR_IDENTIFIER: Intel64 Family 6 Model 186 Stepping 2, GenuineIntel
+PROCESSOR_ARCHITECTURE: AMD64
+fs: 12800 Hz
+f0: 50 Hz
+raw bits/sample: 16

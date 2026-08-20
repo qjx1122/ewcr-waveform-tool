@@ -1,0 +1,375 @@
+=== Experiment 1: fixed scenarios ===
+[Fixed] pure           ASBC      
+    ASBC         | Encode:    7.2939 ms | Decode:    1.1736 ms | Total:    8.4675 ms
+[Fixed] pure           DWT-Hybrid
+    DWT-Hybrid   | Encode:   24.1548 ms | Decode:   14.0670 ms | Total:   38.2218 ms
+[Fixed] pure           CS-OMP    
+    CS-OMP       | Encode:  264.1248 ms | Decode:  288.4357 ms | Total:  552.5605 ms
+[Fixed] pure           MMC       
+    MMC          | Encode: 6379.6951 ms | Decode:    0.8670 ms | Total: 6380.5621 ms
+[Fixed] pure           SVDCS     
+    SVDCS        | Encode:   17.0057 ms | Decode:    3.7813 ms | Total:   20.7870 ms
+[Fixed] sag            ASBC      
+    ASBC         | Encode:    2.6746 ms | Decode:    0.5844 ms | Total:    3.2590 ms
+[Fixed] sag            DWT-Hybrid
+    DWT-Hybrid   | Encode:   18.5606 ms | Decode:   10.8902 ms | Total:   29.4508 ms
+[Fixed] sag            CS-OMP    
+    CS-OMP       | Encode:  261.4558 ms | Decode:  260.0383 ms | Total:  521.4941 ms
+[Fixed] sag            MMC       
+    MMC          | Encode: 6262.1742 ms | Decode:    1.0065 ms | Total: 6263.1807 ms
+[Fixed] sag            SVDCS     
+    SVDCS        | Encode:   10.6366 ms | Decode:    3.1996 ms | Total:   13.8362 ms
+[Fixed] swell          ASBC      
+    ASBC         | Encode:    0.9112 ms | Decode:    0.2786 ms | Total:    1.1898 ms
+[Fixed] swell          DWT-Hybrid
+    DWT-Hybrid   | Encode:   15.3150 ms | Decode:    8.9639 ms | Total:   24.2789 ms
+[Fixed] swell          CS-OMP    
+    CS-OMP       | Encode:  313.9915 ms | Decode:  315.9153 ms | Total:  629.9068 ms
+[Fixed] swell          MMC       
+    MMC          | Encode: 6324.4305 ms | Decode:    0.4624 ms | Total: 6324.8929 ms
+[Fixed] swell          SVDCS     
+    SVDCS        | Encode:    9.7191 ms | Decode:    3.3061 ms | Total:   13.0252 ms
+[Fixed] interruption   ASBC      
+    ASBC         | Encode:    0.8104 ms | Decode:    0.2576 ms | Total:    1.0680 ms
+[Fixed] interruption   DWT-Hybrid
+    DWT-Hybrid   | Encode:   13.1685 ms | Decode:    7.9403 ms | Total:   21.1088 ms
+[Fixed] interruption   CS-OMP    
+    CS-OMP       | Encode:  273.0758 ms | Decode:  300.6332 ms | Total:  573.7090 ms
+[Fixed] interruption   MMC       
+    MMC          | Encode: 6531.8968 ms | Decode:    0.8275 ms | Total: 6532.7243 ms
+[Fixed] interruption   SVDCS     
+    SVDCS        | Encode:    9.7922 ms | Decode:    3.3932 ms | Total:   13.1854 ms
+[Fixed] harmonics      ASBC      
+    ASBC         | Encode:    8.4147 ms | Decode:    0.9184 ms | Total:    9.3331 ms
+[Fixed] harmonics      DWT-Hybrid
+    DWT-Hybrid   | Encode:   15.8169 ms | Decode:   17.1009 ms | Total:   32.9178 ms
+[Fixed] harmonics      CS-OMP    
+    CS-OMP       | Encode:  275.2881 ms | Decode:  302.8839 ms | Total:  578.1720 ms
+[Fixed] harmonics      MMC       
+    MMC          | Encode: 5686.0175 ms | Decode:    0.6257 ms | Total: 5686.6432 ms
+[Fixed] harmonics      SVDCS     
+    SVDCS        | Encode:    9.5574 ms | Decode:    3.1395 ms | Total:   12.6969 ms
+[Fixed] osc_transient  ASBC      
+    ASBC         | Encode:    4.9495 ms | Decode:    0.8242 ms | Total:    5.7737 ms
+[Fixed] osc_transient  DWT-Hybrid
+    DWT-Hybrid   | Encode:   13.6808 ms | Decode:    8.9448 ms | Total:   22.6256 ms
+[Fixed] osc_transient  CS-OMP    
+    CS-OMP       | Encode:  269.7335 ms | Decode:  288.5879 ms | Total:  558.3214 ms
+[Fixed] osc_transient  MMC       
+    MMC          | Encode: 6424.7910 ms | Decode:    0.2509 ms | Total: 6425.0419 ms
+[Fixed] osc_transient  SVDCS     
+    SVDCS        | Encode:   10.8188 ms | Decode:    3.9488 ms | Total:   14.7676 ms
+[Fixed] notch          ASBC      
+    ASBC         | Encode:    4.6922 ms | Decode:    0.8813 ms | Total:    5.5735 ms
+[Fixed] notch          DWT-Hybrid
+    DWT-Hybrid   | Encode:   12.3008 ms | Decode:    9.2281 ms | Total:   21.5289 ms
+[Fixed] notch          CS-OMP    
+    CS-OMP       | Encode:  271.1196 ms | Decode:  273.1111 ms | Total:  544.2307 ms
+[Fixed] notch          MMC       
+    MMC          | Encode: 5878.6142 ms | Decode:    0.3016 ms | Total: 5878.9158 ms
+[Fixed] notch          SVDCS     
+    SVDCS        | Encode:    9.9914 ms | Decode:    3.8539 ms | Total:   13.8453 ms
+[Fixed] flicker        ASBC      
+    ASBC         | Encode:    0.7015 ms | Decode:    0.2006 ms | Total:    0.9021 ms
+[Fixed] flicker        DWT-Hybrid
+    DWT-Hybrid   | Encode:   14.9832 ms | Decode:    8.2470 ms | Total:   23.2302 ms
+[Fixed] flicker        CS-OMP    
+    CS-OMP       | Encode:  264.8667 ms | Decode:  315.6494 ms | Total:  580.5161 ms
+[Fixed] flicker        MMC       
+    MMC          | Encode: 7978.3650 ms | Decode:    0.2712 ms | Total: 7978.6362 ms
+[Fixed] flicker        SVDCS     
+    SVDCS        | Encode:   10.5356 ms | Decode:    3.0891 ms | Total:   13.6247 ms
+[Fixed] spike          ASBC      
+    ASBC         | Encode:    0.8518 ms | Decode:    0.2490 ms | Total:    1.1008 ms
+[Fixed] spike          DWT-Hybrid
+    DWT-Hybrid   | Encode:   10.6703 ms | Decode:    7.4346 ms | Total:   18.1049 ms
+[Fixed] spike          CS-OMP    
+    CS-OMP       | Encode:  282.1524 ms | Decode:  325.8294 ms | Total:  607.9818 ms
+[Fixed] spike          MMC       
+    MMC          | Encode: 6324.7733 ms | Decode:    0.2819 ms | Total: 6325.0552 ms
+[Fixed] spike          SVDCS     
+    SVDCS        | Encode:    8.7676 ms | Decode:    3.3979 ms | Total:   12.1655 ms
+[Fixed] complex        ASBC      
+    ASBC         | Encode:    1.6957 ms | Decode:    0.5225 ms | Total:    2.2182 ms
+[Fixed] complex        DWT-Hybrid
+    DWT-Hybrid   | Encode:   19.6249 ms | Decode:   13.6773 ms | Total:   33.3022 ms
+[Fixed] complex        CS-OMP    
+    CS-OMP       | Encode:  261.8579 ms | Decode:  281.5713 ms | Total:  543.4292 ms
+[Fixed] complex        MMC       
+    MMC          | Encode: 6253.2652 ms | Decode:    0.4762 ms | Total: 6253.7414 ms
+[Fixed] complex        SVDCS     
+    SVDCS        | Encode:   12.0501 ms | Decode:    4.4313 ms | Total:   16.4814 ms
+
+=== Experiment 2: rate-distortion ===
+    ASBC         | Encode:    4.7130 ms | Decode:    0.7211 ms | Total:    5.4341 ms
+    ASBC         | Encode:    2.0773 ms | Decode:    0.6764 ms | Total:    2.7537 ms
+    ASBC         | Encode:    3.3563 ms | Decode:    0.9266 ms | Total:    4.2829 ms
+    ASBC         | Encode:    4.4313 ms | Decode:    0.7982 ms | Total:    5.2295 ms
+    ASBC         | Encode:    2.1952 ms | Decode:    0.5792 ms | Total:    2.7744 ms
+    ASBC         | Encode:    1.9328 ms | Decode:    0.6269 ms | Total:    2.5597 ms
+    ASBC         | Encode:    1.8576 ms | Decode:    0.6722 ms | Total:    2.5298 ms
+    ASBC         | Encode:    1.8943 ms | Decode:    0.6338 ms | Total:    2.5281 ms
+    DWT-Hybrid   | Encode:   16.4694 ms | Decode:    9.5007 ms | Total:   25.9701 ms
+    DWT-Hybrid   | Encode:   19.5799 ms | Decode:   10.7087 ms | Total:   30.2886 ms
+    DWT-Hybrid   | Encode:   18.9426 ms | Decode:   11.8500 ms | Total:   30.7926 ms
+    DWT-Hybrid   | Encode:   18.7719 ms | Decode:   13.1910 ms | Total:   31.9629 ms
+    DWT-Hybrid   | Encode:   19.1634 ms | Decode:   16.3624 ms | Total:   35.5258 ms
+    CS-OMP       | Encode:  113.3746 ms | Decode:  105.2982 ms | Total:  218.6728 ms
+    CS-OMP       | Encode:  159.4726 ms | Decode:  157.1838 ms | Total:  316.6564 ms
+    CS-OMP       | Encode:  273.7211 ms | Decode:  273.4373 ms | Total:  547.1584 ms
+    CS-OMP       | Encode:  431.3166 ms | Decode:  378.5741 ms | Total:  809.8907 ms
+    CS-OMP       | Encode:  563.2733 ms | Decode:  490.2509 ms | Total: 1053.5242 ms
+    MMC          | Encode: 6269.1642 ms | Decode:    0.3283 ms | Total: 6269.4925 ms
+    MMC          | Encode: 5900.2681 ms | Decode:    0.3606 ms | Total: 5900.6287 ms
+    MMC          | Encode: 6224.0069 ms | Decode:    1.0476 ms | Total: 6225.0545 ms
+    MMC          | Encode: 5987.8446 ms | Decode:    0.3486 ms | Total: 5988.1932 ms
+    MMC          | Encode: 6159.4713 ms | Decode:    0.4971 ms | Total: 6159.9684 ms
+    SVDCS        | Encode:   13.0090 ms | Decode:    5.7613 ms | Total:   18.7703 ms
+    SVDCS        | Encode:   11.9507 ms | Decode:    4.8823 ms | Total:   16.8330 ms
+    SVDCS        | Encode:   11.8487 ms | Decode:    4.4133 ms | Total:   16.2620 ms
+    SVDCS        | Encode:   11.4519 ms | Decode:    4.2017 ms | Total:   15.6536 ms
+    SVDCS        | Encode:   11.5253 ms | Decode:    4.9874 ms | Total:   16.5127 ms
+    SVDCS        | Encode:   12.7460 ms | Decode:    4.6834 ms | Total:   17.4294 ms
+    SVDCS        | Encode:   12.1117 ms | Decode:    4.4834 ms | Total:   16.5951 ms
+
+=== Experiment 3: SVDCS duration / event density ===
+    SVDCS        | Encode:   10.1931 ms | Decode:    3.2206 ms | Total:   13.4137 ms
+    SVDCS        | Encode:   26.7280 ms | Decode:    3.4071 ms | Total:   30.1351 ms
+    SVDCS        | Encode:   93.4531 ms | Decode:    6.2276 ms | Total:   99.6807 ms
+    SVDCS        | Encode:  470.8715 ms | Decode:   14.0017 ms | Total:  484.8732 ms
+    SVDCS        | Encode: 1952.0469 ms | Decode:   39.8215 ms | Total: 1991.8684 ms
+    SVDCS        | Encode:   11.3085 ms | Decode:    4.2705 ms | Total:   15.5790 ms
+    SVDCS        | Encode:   28.2963 ms | Decode:    5.2973 ms | Total:   33.5936 ms
+    SVDCS        | Encode:   92.3069 ms | Decode:    8.2324 ms | Total:  100.5393 ms
+    SVDCS        | Encode:  498.2141 ms | Decode:   23.7280 ms | Total:  521.9421 ms
+    SVDCS        | Encode:  118.5977 ms | Decode:   20.0116 ms | Total:  138.6093 ms
+    SVDCS        | Encode:  102.3235 ms | Decode:   15.9080 ms | Total:  118.2315 ms
+    SVDCS        | Encode:   98.8148 ms | Decode:   10.8993 ms | Total:  109.7141 ms
+    SVDCS        | Encode:   94.4240 ms | Decode:    8.3979 ms | Total:  102.8219 ms
+    SVDCS        | Encode:   88.4584 ms | Decode:    7.1176 ms | Total:   95.5760 ms
+    SVDCS        | Encode:   77.2770 ms | Decode:    5.7004 ms | Total:   82.9774 ms
+    SVDCS        | Encode:   76.3052 ms | Decode:    5.1027 ms | Total:   81.4079 ms
+
+=== Experiment 4: noise robustness ===
+[Noise] SNR=Inf ASBC      
+    ASBC         | Encode:    1.8679 ms | Decode:    0.5665 ms | Total:    2.4344 ms
+[Noise] SNR=Inf DWT-Hybrid
+    DWT-Hybrid   | Encode:   16.0241 ms | Decode:    9.9342 ms | Total:   25.9583 ms
+[Noise] SNR=Inf CS-OMP    
+    CS-OMP       | Encode:  246.9920 ms | Decode:  250.2952 ms | Total:  497.2872 ms
+[Noise] SNR=Inf MMC       
+    MMC          | Encode: 6234.9415 ms | Decode:    0.3796 ms | Total: 6235.3211 ms
+[Noise] SNR=Inf SVDCS     
+    SVDCS        | Encode:   11.2966 ms | Decode:    4.5651 ms | Total:   15.8617 ms
+[Noise] SNR=45 ASBC      
+    ASBC         | Encode:    2.0434 ms | Decode:    0.6117 ms | Total:    2.6551 ms
+[Noise] SNR=45 DWT-Hybrid
+    DWT-Hybrid   | Encode:   21.5847 ms | Decode:   23.8292 ms | Total:   45.4139 ms
+[Noise] SNR=45 CS-OMP    
+    CS-OMP       | Encode:  299.2927 ms | Decode:  322.8137 ms | Total:  622.1064 ms
+[Noise] SNR=45 MMC       
+    MMC          | Encode: 6179.2207 ms | Decode:    0.2794 ms | Total: 6179.5001 ms
+[Noise] SNR=45 SVDCS     
+    SVDCS        | Encode:   10.3671 ms | Decode:    3.9853 ms | Total:   14.3524 ms
+[Noise] SNR=35 ASBC      
+    ASBC         | Encode:    1.7318 ms | Decode:    0.5617 ms | Total:    2.2935 ms
+[Noise] SNR=35 DWT-Hybrid
+    DWT-Hybrid   | Encode:   24.8304 ms | Decode:   26.5643 ms | Total:   51.3947 ms
+[Noise] SNR=35 CS-OMP    
+    CS-OMP       | Encode:  277.7508 ms | Decode:  290.0159 ms | Total:  567.7667 ms
+[Noise] SNR=35 MMC       
+    MMC          | Encode: 6301.7236 ms | Decode:    0.3902 ms | Total: 6302.1138 ms
+[Noise] SNR=35 SVDCS     
+    SVDCS        | Encode:   11.8104 ms | Decode:    4.5197 ms | Total:   16.3301 ms
+[Noise] SNR=25 ASBC      
+    ASBC         | Encode:    1.9036 ms | Decode:    0.6290 ms | Total:    2.5326 ms
+[Noise] SNR=25 DWT-Hybrid
+    DWT-Hybrid   | Encode:   35.7676 ms | Decode:   34.7251 ms | Total:   70.4927 ms
+[Noise] SNR=25 CS-OMP    
+    CS-OMP       | Encode:  270.3388 ms | Decode:  281.4150 ms | Total:  551.7538 ms
+[Noise] SNR=25 MMC       
+    MMC          | Encode: 6486.8119 ms | Decode:    0.3740 ms | Total: 6487.1859 ms
+[Noise] SNR=25 SVDCS     
+    SVDCS        | Encode:   10.8677 ms | Decode:    4.1930 ms | Total:   15.0607 ms
+
+=== Experiment 5: encode/decode timing + memory/resource profiling ===
+[Profile] pure           ASBC      
+    ASBC         | Encode:    0.9668 ms | Decode:    0.2210 ms | Total:    1.1878 ms
+    ASBC         | Encode:    0.9327 ms | Decode:    0.2308 ms | Total:    1.1635 ms
+    ASBC         | Encode:    0.7963 ms | Decode:    0.2113 ms | Total:    1.0076 ms
+    ASBC         | Encode:    0.8008 ms | Decode:    0.2379 ms | Total:    1.0387 ms
+    ASBC         | Encode:    0.7953 ms | Decode:    0.2065 ms | Total:    1.0018 ms
+[Profile] pure           DWT-Hybrid
+    DWT-Hybrid   | Encode:   11.7520 ms | Decode:    7.6616 ms | Total:   19.4136 ms
+    DWT-Hybrid   | Encode:   10.5398 ms | Decode:    7.7311 ms | Total:   18.2709 ms
+    DWT-Hybrid   | Encode:   10.2968 ms | Decode:    7.5731 ms | Total:   17.8699 ms
+    DWT-Hybrid   | Encode:   10.0738 ms | Decode:    7.1688 ms | Total:   17.2426 ms
+    DWT-Hybrid   | Encode:    9.8984 ms | Decode:    7.2230 ms | Total:   17.1214 ms
+[Profile] pure           CS-OMP    
+    CS-OMP       | Encode:  266.7807 ms | Decode:  300.4625 ms | Total:  567.2432 ms
+    CS-OMP       | Encode:  315.2553 ms | Decode:  330.1639 ms | Total:  645.4192 ms
+    CS-OMP       | Encode:  274.8839 ms | Decode:  357.9439 ms | Total:  632.8278 ms
+    CS-OMP       | Encode:  235.8946 ms | Decode:  270.1742 ms | Total:  506.0688 ms
+    CS-OMP       | Encode:  232.5080 ms | Decode:  317.1410 ms | Total:  549.6490 ms
+[Profile] pure           MMC       
+    MMC          | Encode: 6258.4974 ms | Decode:    0.2648 ms | Total: 6258.7622 ms
+    MMC          | Encode: 6302.5843 ms | Decode:    0.2356 ms | Total: 6302.8199 ms
+    MMC          | Encode: 6247.8314 ms | Decode:    0.2562 ms | Total: 6248.0876 ms
+    MMC          | Encode: 6367.6862 ms | Decode:    0.3145 ms | Total: 6368.0007 ms
+    MMC          | Encode: 6318.8447 ms | Decode:    0.2533 ms | Total: 6319.0980 ms
+[Profile] pure           SVDCS     
+    SVDCS        | Encode:    8.9544 ms | Decode:    2.8987 ms | Total:   11.8531 ms
+    SVDCS        | Encode:    8.4855 ms | Decode:    2.8374 ms | Total:   11.3229 ms
+    SVDCS        | Encode:    8.6915 ms | Decode:    2.8806 ms | Total:   11.5721 ms
+    SVDCS        | Encode:    8.5911 ms | Decode:    2.8740 ms | Total:   11.4651 ms
+    SVDCS        | Encode:    8.4928 ms | Decode:    3.0996 ms | Total:   11.5924 ms
+[Profile] complex        ASBC      
+    ASBC         | Encode:    1.8610 ms | Decode:    0.5997 ms | Total:    2.4607 ms
+    ASBC         | Encode:    1.7277 ms | Decode:    0.5775 ms | Total:    2.3052 ms
+    ASBC         | Encode:    1.7822 ms | Decode:    0.5923 ms | Total:    2.3745 ms
+    ASBC         | Encode:    1.7500 ms | Decode:    0.5800 ms | Total:    2.3300 ms
+    ASBC         | Encode:    1.7302 ms | Decode:    0.5939 ms | Total:    2.3241 ms
+[Profile] complex        DWT-Hybrid
+    DWT-Hybrid   | Encode:   18.2611 ms | Decode:   11.5166 ms | Total:   29.7777 ms
+    DWT-Hybrid   | Encode:   19.5488 ms | Decode:   16.8252 ms | Total:   36.3740 ms
+    DWT-Hybrid   | Encode:   19.5068 ms | Decode:   12.8188 ms | Total:   32.3256 ms
+    DWT-Hybrid   | Encode:   21.4415 ms | Decode:   22.6892 ms | Total:   44.1307 ms
+    DWT-Hybrid   | Encode:   18.2844 ms | Decode:   12.2235 ms | Total:   30.5079 ms
+[Profile] complex        CS-OMP    
+    CS-OMP       | Encode:  319.5652 ms | Decode:  329.2503 ms | Total:  648.8155 ms
+    CS-OMP       | Encode:  352.6922 ms | Decode:  314.6109 ms | Total:  667.3031 ms
+    CS-OMP       | Encode:  288.8513 ms | Decode:  259.9066 ms | Total:  548.7579 ms
+    CS-OMP       | Encode:  352.2343 ms | Decode:  240.6350 ms | Total:  592.8693 ms
+    CS-OMP       | Encode:  271.3651 ms | Decode:  342.3961 ms | Total:  613.7612 ms
+[Profile] complex        MMC       
+    MMC          | Encode: 6231.6454 ms | Decode:    0.3604 ms | Total: 6232.0058 ms
+    MMC          | Encode: 6078.0985 ms | Decode:    0.2677 ms | Total: 6078.3662 ms
+    MMC          | Encode: 6101.7259 ms | Decode:    0.3719 ms | Total: 6102.0978 ms
+    MMC          | Encode: 6154.2078 ms | Decode:    0.3488 ms | Total: 6154.5566 ms
+    MMC          | Encode: 6048.3608 ms | Decode:    0.2976 ms | Total: 6048.6584 ms
+[Profile] complex        SVDCS     
+    SVDCS        | Encode:   10.3620 ms | Decode:    4.0114 ms | Total:   14.3734 ms
+    SVDCS        | Encode:   10.3091 ms | Decode:    4.0043 ms | Total:   14.3134 ms
+    SVDCS        | Encode:    9.9046 ms | Decode:    3.9600 ms | Total:   13.8646 ms
+    SVDCS        | Encode:   10.5801 ms | Decode:    4.2384 ms | Total:   14.8185 ms
+    SVDCS        | Encode:   11.2109 ms | Decode:    4.4152 ms | Total:   15.6261 ms
+[Profile] osc_transient  ASBC      
+    ASBC         | Encode:    2.0190 ms | Decode:    0.4115 ms | Total:    2.4305 ms
+    ASBC         | Encode:    2.0792 ms | Decode:    0.4451 ms | Total:    2.5243 ms
+    ASBC         | Encode:    2.1423 ms | Decode:    0.4100 ms | Total:    2.5523 ms
+    ASBC         | Encode:    2.0153 ms | Decode:    0.3804 ms | Total:    2.3957 ms
+    ASBC         | Encode:    1.9393 ms | Decode:    0.4706 ms | Total:    2.4099 ms
+[Profile] osc_transient  DWT-Hybrid
+    DWT-Hybrid   | Encode:   15.3164 ms | Decode:    9.3969 ms | Total:   24.7133 ms
+    DWT-Hybrid   | Encode:   15.1793 ms | Decode:    9.2420 ms | Total:   24.4213 ms
+    DWT-Hybrid   | Encode:   14.3437 ms | Decode:    8.8626 ms | Total:   23.2063 ms
+    DWT-Hybrid   | Encode:   13.8977 ms | Decode:    8.7075 ms | Total:   22.6052 ms
+    DWT-Hybrid   | Encode:   14.6425 ms | Decode:    9.0476 ms | Total:   23.6901 ms
+[Profile] osc_transient  CS-OMP    
+    CS-OMP       | Encode:  298.5107 ms | Decode:  318.2855 ms | Total:  616.7962 ms
+    CS-OMP       | Encode:  294.3820 ms | Decode:  361.8511 ms | Total:  656.2331 ms
+    CS-OMP       | Encode:  322.8332 ms | Decode:  287.9813 ms | Total:  610.8145 ms
+    CS-OMP       | Encode:  302.4489 ms | Decode:  262.9759 ms | Total:  565.4248 ms
+    CS-OMP       | Encode:  260.8765 ms | Decode:  262.4601 ms | Total:  523.3366 ms
+[Profile] osc_transient  MMC       
+    MMC          | Encode: 6302.9780 ms | Decode:    0.2803 ms | Total: 6303.2583 ms
+    MMC          | Encode: 6386.7761 ms | Decode:    0.2567 ms | Total: 6387.0328 ms
+    MMC          | Encode: 6249.3573 ms | Decode:    0.2731 ms | Total: 6249.6304 ms
+    MMC          | Encode: 6278.3706 ms | Decode:    0.2734 ms | Total: 6278.6440 ms
+    MMC          | Encode: 6229.2459 ms | Decode:    0.2708 ms | Total: 6229.5167 ms
+[Profile] osc_transient  SVDCS     
+    SVDCS        | Encode:   11.6020 ms | Decode:    4.3407 ms | Total:   15.9427 ms
+    SVDCS        | Encode:   11.1492 ms | Decode:    4.2807 ms | Total:   15.4299 ms
+    SVDCS        | Encode:   11.0758 ms | Decode:    4.3338 ms | Total:   15.4096 ms
+    SVDCS        | Encode:   11.1912 ms | Decode:    4.5366 ms | Total:   15.7278 ms
+    SVDCS        | Encode:   11.1986 ms | Decode:    4.6785 ms | Total:   15.8771 ms
+[Profile-scale]  2 cyc ASBC      
+    ASBC         | Encode:    2.3953 ms | Decode:    0.3887 ms | Total:    2.7840 ms
+    ASBC         | Encode:    0.7223 ms | Decode:    0.1366 ms | Total:    0.8589 ms
+    ASBC         | Encode:    0.6550 ms | Decode:    0.1191 ms | Total:    0.7741 ms
+    ASBC         | Encode:    0.6667 ms | Decode:    0.1417 ms | Total:    0.8084 ms
+    ASBC         | Encode:    0.6374 ms | Decode:    0.1245 ms | Total:    0.7619 ms
+[Profile-scale]  2 cyc DWT-Hybrid
+    DWT-Hybrid   | Encode:    8.2491 ms | Decode:    3.4575 ms | Total:   11.7066 ms
+    DWT-Hybrid   | Encode:    8.3951 ms | Decode:    3.5234 ms | Total:   11.9185 ms
+    DWT-Hybrid   | Encode:    8.2193 ms | Decode:    3.3977 ms | Total:   11.6170 ms
+    DWT-Hybrid   | Encode:    8.5981 ms | Decode:    3.5943 ms | Total:   12.1924 ms
+    DWT-Hybrid   | Encode:    8.2237 ms | Decode:    3.6073 ms | Total:   11.8310 ms
+[Profile-scale]  2 cyc CS-OMP    
+    CS-OMP       | Encode:   10.5278 ms | Decode:    9.1267 ms | Total:   19.6545 ms
+    CS-OMP       | Encode:    9.8845 ms | Decode:    9.9384 ms | Total:   19.8229 ms
+    CS-OMP       | Encode:    9.4482 ms | Decode:   10.1828 ms | Total:   19.6310 ms
+    CS-OMP       | Encode:    9.3980 ms | Decode:    9.0298 ms | Total:   18.4278 ms
+    CS-OMP       | Encode:    9.0108 ms | Decode:   10.5263 ms | Total:   19.5371 ms
+[Profile-scale]  2 cyc MMC       
+    MMC          | Encode: 1603.8837 ms | Decode:    0.1128 ms | Total: 1603.9965 ms
+    MMC          | Encode: 1484.5991 ms | Decode:    0.1140 ms | Total: 1484.7131 ms
+    MMC          | Encode: 1575.8258 ms | Decode:    0.1248 ms | Total: 1575.9506 ms
+    MMC          | Encode: 1478.7980 ms | Decode:    0.1027 ms | Total: 1478.9007 ms
+    MMC          | Encode: 1480.8064 ms | Decode:    0.1197 ms | Total: 1480.9261 ms
+[Profile-scale]  2 cyc SVDCS     
+    SVDCS        | Encode:    6.7506 ms | Decode:    4.0538 ms | Total:   10.8044 ms
+    SVDCS        | Encode:    6.6027 ms | Decode:    3.7796 ms | Total:   10.3823 ms
+    SVDCS        | Encode:    6.6368 ms | Decode:    3.7160 ms | Total:   10.3528 ms
+    SVDCS        | Encode:    6.5714 ms | Decode:    3.6817 ms | Total:   10.2531 ms
+    SVDCS        | Encode:    6.5304 ms | Decode:    4.2696 ms | Total:   10.8000 ms
+[Profile-scale]  4 cyc ASBC      
+    ASBC         | Encode:    1.6511 ms | Decode:    0.3479 ms | Total:    1.9990 ms
+    ASBC         | Encode:    0.8179 ms | Decode:    0.2736 ms | Total:    1.0915 ms
+    ASBC         | Encode:    0.7949 ms | Decode:    0.2662 ms | Total:    1.0611 ms
+    ASBC         | Encode:    0.8081 ms | Decode:    0.2555 ms | Total:    1.0636 ms
+    ASBC         | Encode:    1.0796 ms | Decode:    0.3194 ms | Total:    1.3990 ms
+[Profile-scale]  4 cyc DWT-Hybrid
+    DWT-Hybrid   | Encode:   10.2295 ms | Decode:    5.1190 ms | Total:   15.3485 ms
+    DWT-Hybrid   | Encode:    9.5752 ms | Decode:    5.5295 ms | Total:   15.1047 ms
+    DWT-Hybrid   | Encode:   10.2352 ms | Decode:    5.4806 ms | Total:   15.7158 ms
+    DWT-Hybrid   | Encode:    9.6878 ms | Decode:    5.0951 ms | Total:   14.7829 ms
+    DWT-Hybrid   | Encode:    9.5427 ms | Decode:    4.8340 ms | Total:   14.3767 ms
+[Profile-scale]  4 cyc CS-OMP    
+    CS-OMP       | Encode:   28.1950 ms | Decode:   34.5440 ms | Total:   62.7390 ms
+    CS-OMP       | Encode:   28.0228 ms | Decode:   33.2375 ms | Total:   61.2603 ms
+    CS-OMP       | Encode:   30.0348 ms | Decode:   31.4159 ms | Total:   61.4507 ms
+    CS-OMP       | Encode:   34.4402 ms | Decode:   35.3685 ms | Total:   69.8087 ms
+    CS-OMP       | Encode:   39.4481 ms | Decode:   34.1836 ms | Total:   73.6317 ms
+[Profile-scale]  4 cyc MMC       
+    MMC          | Encode: 2579.0353 ms | Decode:    0.2159 ms | Total: 2579.2512 ms
+    MMC          | Encode: 2636.3136 ms | Decode:    0.2280 ms | Total: 2636.5416 ms
+    MMC          | Encode: 2488.1055 ms | Decode:    0.1691 ms | Total: 2488.2746 ms
+    MMC          | Encode: 2626.3748 ms | Decode:    0.2032 ms | Total: 2626.5780 ms
+    MMC          | Encode: 2540.4433 ms | Decode:    0.1804 ms | Total: 2540.6237 ms
+[Profile-scale]  4 cyc SVDCS     
+    SVDCS        | Encode:    8.5870 ms | Decode:    4.4567 ms | Total:   13.0437 ms
+    SVDCS        | Encode:    8.5644 ms | Decode:    5.1467 ms | Total:   13.7111 ms
+    SVDCS        | Encode:    8.4172 ms | Decode:    4.5909 ms | Total:   13.0081 ms
+    SVDCS        | Encode:    8.7184 ms | Decode:    4.5570 ms | Total:   13.2754 ms
+    SVDCS        | Encode:    8.5923 ms | Decode:    4.5046 ms | Total:   13.0969 ms
+[Profile-scale] 10 cyc ASBC      
+    ASBC         | Encode:    1.9782 ms | Decode:    0.6436 ms | Total:    2.6218 ms
+    ASBC         | Encode:    1.9737 ms | Decode:    0.7642 ms | Total:    2.7379 ms
+    ASBC         | Encode:    2.6268 ms | Decode:    0.7866 ms | Total:    3.4134 ms
+    ASBC         | Encode:    5.3220 ms | Decode:    2.6841 ms | Total:    8.0061 ms
+    ASBC         | Encode:    3.4831 ms | Decode:    1.0987 ms | Total:    4.5818 ms
+[Profile-scale] 10 cyc DWT-Hybrid
+    DWT-Hybrid   | Encode:   39.6203 ms | Decode:   14.4051 ms | Total:   54.0254 ms
+    DWT-Hybrid   | Encode:   25.2905 ms | Decode:   17.1970 ms | Total:   42.4875 ms
+    DWT-Hybrid   | Encode:   31.4306 ms | Decode:   14.6776 ms | Total:   46.1082 ms
+    DWT-Hybrid   | Encode:   22.5728 ms | Decode:   14.3770 ms | Total:   36.9498 ms
+    DWT-Hybrid   | Encode:   21.4604 ms | Decode:   14.1298 ms | Total:   35.5902 ms
+[Profile-scale] 10 cyc CS-OMP    
+    CS-OMP       | Encode:  337.2715 ms | Decode:  310.1253 ms | Total:  647.3968 ms
+    CS-OMP       | Encode:  319.0160 ms | Decode:  267.4222 ms | Total:  586.4382 ms
+    CS-OMP       | Encode:  266.9503 ms | Decode:  251.0454 ms | Total:  517.9957 ms
+    CS-OMP       | Encode:  303.7768 ms | Decode:  266.8211 ms | Total:  570.5979 ms
+    CS-OMP       | Encode:  302.0012 ms | Decode:  294.9060 ms | Total:  596.9072 ms
+[Profile-scale] 10 cyc MMC       
+    MMC          | Encode: 6228.5461 ms | Decode:    0.3236 ms | Total: 6228.8697 ms
+    MMC          | Encode: 6037.2686 ms | Decode:    0.3139 ms | Total: 6037.5825 ms
+    MMC          | Encode: 6263.0248 ms | Decode:    0.3926 ms | Total: 6263.4174 ms
+    MMC          | Encode: 6106.1706 ms | Decode:    0.3601 ms | Total: 6106.5307 ms
+    MMC          | Encode: 6136.6195 ms | Decode:    0.3631 ms | Total: 6136.9826 ms
+[Profile-scale] 10 cyc SVDCS     
+    SVDCS        | Encode:   10.4188 ms | Decode:    4.1254 ms | Total:   14.5442 ms
+    SVDCS        | Encode:   10.3773 ms | Decode:    4.1605 ms | Total:   14.5378 ms
+    SVDCS        | Encode:   10.7211 ms | Decode:    4.1277 ms | Total:   14.8488 ms
+    SVDCS        | Encode:   10.4256 ms | Decode:    4.2735 ms | Total:   14.6991 ms
+    SVDCS        | Encode:   11.0469 ms | Decode:    4.6202 ms | Total:   15.6671 ms

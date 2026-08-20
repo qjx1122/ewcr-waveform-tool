@@ -1,0 +1,6 @@
+algo,encoder_working_est_MiB,decoder_working_est_MiB,source_mfile_KiB,note
+ASBC,0.2383880615234375,0.087890625,9.591796875,dominant current MATLAB numeric arrays; packet/container excluded
+DWT-Hybrid,0.15625,0.1171875,8.16796875,O(N) transform/threshold arrays; Huffman dictionary and packet excluded
+CS-OMP,130.59375,130.59375,5.650390625,current dense DFT-matrix implementation; includes Phi/Psi/A and OMP support workspace
+MMC,0.68359375,0.515625,21.3115234375,current explicit DCT cache plus candidate/search arrays; payload excluded
+SVDCS,2.130859375,2.078125,27.9287109375,current MATLAB LZW alone allocates 2 MiB transition table; not paper FPGA RAM usage

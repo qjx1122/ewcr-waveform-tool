@@ -1,0 +1,4 @@
+algo,param,N,fs,enc_time_s,CR,SNR_dB,source
+ASBC,W=20,2560,12800,0.0614897,8.927637314734088,28.497861085119776,supplied MATLAB benchmark_results.mat; single recorded encode call
+DWT-Hybrid,E=0.9900,2560,12800,0.06159,3.332519729883655,35.83677071157738,supplied MATLAB benchmark_results.mat; single recorded encode call
+CS-OMP,M/N=0.20,2560,12800,0.8313594,4.904214559386973,26.81752349645654,supplied MATLAB benchmark_results.mat; single recorded encode call
